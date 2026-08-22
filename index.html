@@ -66,7 +66,7 @@ button,input,select{font:inherit} button{cursor:pointer}
     </div>
     <h1>Questionnaire Result Portal</h1>
     <p>أدخل الكود الوظيفي للوصول إلى نتيجة الاختبار والصلاحيات.</p>
-    <div class="field"><label for="loginCode">الكود الوظيفي</label><input id="loginCode" autocomplete="off" placeholder="اكتب الكود الوظيفي" /></div>
+    <div class="field"><label for="loginCode">الكود الوظيفي</label><input id="loginCode" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" enterkeyhint="done" placeholder="اكتب الكود الوظيفي" /></div>
     <button class="primary" id="loginBtn">دخول</button>
     <div id="loginError" class="error hidden"></div>
   </div>

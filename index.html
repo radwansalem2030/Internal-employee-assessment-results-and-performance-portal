@@ -3,325 +3,329 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Questionnaire Result Portal</title>
-<meta name="description" content="Questionnaire Result Portal" />
+<title>Employee Assessment Performance Portal</title>
+<meta name="description" content="Monthly Employee Assessment Performance Portal" />
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 <style>
 :root{
-  --green:#00A970; --green-dark:#00885a; --green-soft:#e9fbf4; --navy:#0f1b2d; --navy-2:#16243a;
-  --bg:#f5f8f7; --card:#ffffff; --text:#142033; --muted:#64748b; --line:#e5eaf0;
-  --red:#dc4c4c; --red-soft:#fff1f1; --amber:#c88b00; --amber-soft:#fff7df; --blue:#3978d7; --blue-soft:#eef5ff;
+  --green:#00A970; --green-dark:#00885a; --green-soft:#e9fbf4; --green-soft-2:#f2fbf7;
+  --navy:#102033; --navy-2:#172a42; --bg:#f5f8f7; --card:#fff; --text:#142033; --muted:#64748b; --line:#e4ebe7;
+  --red:#c54b4b; --red-soft:#fff1f1; --amber:#b27a00; --amber-soft:#fff7df; --blue:#386fc7; --blue-soft:#eef4ff;
   --shadow:0 10px 30px rgba(15,27,45,.08); --radius:18px;
 }
-*{box-sizing:border-box} body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Tahoma,Arial,sans-serif;background:var(--bg);color:var(--text)}
-button,input,select{font:inherit} button{cursor:pointer}
-.hidden{display:none!important}.muted{color:var(--muted)}
+*{box-sizing:border-box} html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Tahoma,Arial,sans-serif}
+button,input,select{font:inherit} button{cursor:pointer}.hidden{display:none!important}.muted{color:var(--muted)}
 #loginView{min-height:100vh;display:grid;place-items:center;padding:24px;background:radial-gradient(circle at 20% 10%,#dcfff0 0,transparent 30%),linear-gradient(135deg,#f7fbfa,#eef5f2)}
-.login-card{width:min(460px,100%);background:#fff;border:1px solid #e7efec;border-radius:26px;padding:36px;box-shadow:0 22px 70px rgba(8,43,31,.12)}
-.brand-mark{width:64px;height:64px;margin:0 auto;border-radius:16px;background:var(--green);display:grid;place-items:center;color:#fff;font-weight:800;font-size:22px;box-shadow:0 8px 22px rgba(0,169,112,.25)}
-.login-card h1{font-size:30px;line-height:1.15;margin:22px 0 8px}.login-card p{margin:0 0 24px;color:var(--muted)}
-.field{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}.field label{font-weight:700;font-size:14px}.field input{height:52px;border:1px solid #dfe7e3;border-radius:14px;padding:0 15px;outline:none;transition:.2s;background:#fcfefd}.field input:focus{border-color:var(--green);box-shadow:0 0 0 4px rgba(0,169,112,.12)}
+.login-card{width:min(470px,100%);background:#fff;border:1px solid #e7efec;border-radius:26px;padding:36px;box-shadow:0 22px 70px rgba(8,43,31,.12)}
+.brand-mark{width:64px;height:64px;margin:0 auto;border-radius:16px;background:var(--green);display:grid;place-items:center;color:#fff;font-weight:800;font-size:24px;box-shadow:0 8px 22px rgba(0,169,112,.25)}
+.login-card h1{font-size:30px;line-height:1.15;margin:22px 0 8px;text-align:center}.login-card .subtitle{margin:0 0 24px;color:var(--muted);text-align:center}
+.field{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}.field label{font-weight:750;font-size:14px}.field input{height:52px;border:1px solid #dfe7e3;border-radius:14px;padding:0 15px;outline:none;transition:.2s;background:#fcfefd}.field input:focus{border-color:var(--green);box-shadow:0 0 0 4px rgba(0,169,112,.12)}
 .primary{width:100%;height:52px;border:0;border-radius:14px;background:var(--green);color:#fff;font-weight:800;box-shadow:0 8px 20px rgba(0,169,112,.22)}.primary:hover{background:var(--green-dark)}
-.error{margin-top:12px;padding:12px 14px;border-radius:12px;background:var(--red-soft);color:#a63d3d;font-size:14px}
-#app{min-height:100vh;display:flex}.sidebar{width:250px;background:var(--navy);color:#dbe4ef;position:fixed;inset:0 auto 0 0;z-index:20;display:flex;flex-direction:column}
-.sidebar-header{padding:22px 20px;border-bottom:1px solid rgba(255,255,255,.08)}.logo-row{display:flex;align-items:center;gap:12px}.mini-mark{width:38px;height:38px;border-radius:12px;background:var(--green);display:grid;place-items:center;color:#fff;font-weight:900}.logo-title{font-weight:850;color:#fff}.logo-sub{font-size:11px;color:#95a5b9;margin-top:2px}
-.user-box{padding:18px 20px;border-bottom:1px solid rgba(255,255,255,.08)}.user-name{color:#fff;font-weight:750;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.user-meta{font-size:12px;color:#96a5b8;margin-top:3px}
-.nav{padding:16px 10px;display:flex;flex-direction:column;gap:6px}.nav button{border:0;background:transparent;color:#b9c5d4;text-align:left;padding:11px 13px;border-radius:12px;font-weight:700;display:flex;align-items:center;gap:10px}.nav button:hover,.nav button.active{background:rgba(0,169,112,.16);color:#fff}.nav .dot{width:8px;height:8px;border-radius:50%;background:currentColor;opacity:.8}
-.sidebar-footer{margin-top:auto;padding:18px 20px;color:#7f8da0;font-size:11px;border-top:1px solid rgba(255,255,255,.08)}
-.main{margin-left:250px;flex:1;min-width:0}.topbar{height:76px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 30px;position:sticky;top:0;z-index:10}.page-title{font-size:22px;font-weight:850}.page-sub{color:var(--muted);font-size:12px;margin-top:3px}.top-actions{display:flex;align-items:center;gap:10px}.logout{height:40px;border:1px solid var(--line);border-radius:11px;background:#fff;padding:0 14px;font-weight:700;color:var(--text)}
-.content{padding:28px 30px 40px;max-width:1600px;margin:auto}.grid{display:grid;gap:16px}.kpis{grid-template-columns:repeat(5,minmax(0,1fr))}.kpi{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:var(--shadow)}.kpi .label{font-size:12px;color:var(--muted);font-weight:750}.kpi .value{font-size:30px;font-weight:900;margin-top:8px}.kpi .hint{font-size:11px;color:var(--muted);margin-top:6px}.kpi.green .value{color:var(--green)}.kpi.red .value{color:var(--red)}.kpi.amber .value{color:var(--amber)}
-.card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:var(--shadow)}.card h3{margin:0;font-size:16px}.card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:15px;margin-bottom:18px}.section-note{font-size:12px;color:var(--muted)}
-.two{grid-template-columns:1.3fr .9fr}.three{grid-template-columns:repeat(3,minmax(0,1fr))}.four{grid-template-columns:repeat(4,minmax(0,1fr))}.performance-stack{display:block}.performance-stack>.card{width:100%}.dashboard-ranking-stack{display:flex;flex-direction:column;gap:16px}.dashboard-ranking-stack>.card{width:100%}
-.chart-wrap{height:300px}.chart-wrap.tall{height:370px}
+.error{margin-top:12px;padding:12px 14px;border-radius:12px;background:var(--red-soft);color:#a63d3d;font-size:14px;line-height:1.55}
+#app{min-height:100vh;display:flex}.sidebar{width:250px;background:var(--navy);color:#dbe4ef;position:fixed;inset:0 auto 0 0;z-index:40;display:flex;flex-direction:column}.sidebar-header{padding:22px 20px;border-bottom:1px solid rgba(255,255,255,.08)}.logo-row{display:flex;align-items:center;gap:12px}.mini-mark{width:38px;height:38px;border-radius:12px;background:var(--green);display:grid;place-items:center;color:#fff;font-weight:900}.logo-title{font-weight:850;color:#fff}.logo-sub{font-size:11px;color:#95a5b9;margin-top:2px}.user-box{padding:18px 20px;border-bottom:1px solid rgba(255,255,255,.08)}.user-name{color:#fff;font-weight:750;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.user-meta{font-size:12px;color:#96a5b8;margin-top:3px}.nav{padding:16px 10px;display:flex;flex-direction:column;gap:6px}.nav button{border:0;background:transparent;color:#b9c5d4;text-align:left;padding:11px 13px;border-radius:12px;font-weight:700;display:flex;align-items:center;gap:10px}.nav button:hover,.nav button.active{background:rgba(0,169,112,.16);color:#fff}.nav .dot{width:8px;height:8px;border-radius:50%;background:currentColor;opacity:.8}.sidebar-footer{margin-top:auto;padding:18px 20px;color:#7f8da0;font-size:11px;border-top:1px solid rgba(255,255,255,.08)}
+.main{margin-left:250px;flex:1;min-width:0}.topbar{height:78px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 30px;position:sticky;top:0;z-index:20}.topbar-left{display:flex;align-items:center;gap:10px}.page-title{font-size:22px;font-weight:850}.page-sub{color:var(--muted);font-size:12px;margin-top:3px}.top-actions{display:flex;align-items:center;gap:10px}.period-select{height:42px;border:1px solid var(--line);border-radius:11px;background:#fff;padding:0 12px;font-weight:700;color:var(--text)}.logout{height:40px;border:1px solid var(--line);border-radius:11px;background:#fff;padding:0 14px;font-weight:700;color:var(--text)}
+.content{padding:28px 30px 44px;max-width:1600px;margin:auto}.grid{display:grid;gap:16px}.kpis{grid-template-columns:repeat(6,minmax(0,1fr))}.kpi{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:17px;box-shadow:var(--shadow)}.kpi .label{font-size:12px;color:var(--muted);font-weight:750}.kpi .value{font-size:29px;font-weight:900;margin-top:8px}.kpi .hint{font-size:11px;color:var(--muted);margin-top:5px;line-height:1.45}.kpi.green .value{color:var(--green)}.kpi.red .value{color:var(--red)}.kpi.amber .value{color:var(--amber)}.kpi.blue .value{color:var(--blue)}
+.card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:var(--shadow)}.card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:15px;margin-bottom:18px}.card h3{margin:0;font-size:16px}.section-note{font-size:12px;color:var(--muted);margin-top:4px;line-height:1.55}.two{grid-template-columns:1.35fr .95fr}.three{grid-template-columns:repeat(3,minmax(0,1fr))}.four{grid-template-columns:repeat(4,minmax(0,1fr))}.chart-wrap{height:310px}.chart-wrap.tall{height:380px}
 .badge{display:inline-flex;align-items:center;gap:6px;padding:5px 9px;border-radius:999px;font-size:11px;font-weight:800;background:#f1f4f7;color:#455367}.badge.green{background:var(--green-soft);color:var(--green-dark)}.badge.red{background:var(--red-soft);color:#b74545}.badge.amber{background:var(--amber-soft);color:#9a6900}.badge.blue{background:var(--blue-soft);color:#3b66a3}.badge.gray{background:#f1f4f7;color:#59677a}
-.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:14px}.table{width:100%;border-collapse:collapse;min-width:760px}.table th,.table td{padding:12px 14px;border-bottom:1px solid #eef1f4;text-align:left;font-size:13px;vertical-align:top}.table th{background:#f8fafb;color:#5b687a;font-size:11px;text-transform:uppercase;letter-spacing:.04em;position:sticky;top:0}.table tr:hover td{background:#fbfdfc}.link{color:var(--green-dark);font-weight:800;text-decoration:none;cursor:pointer}.score{font-weight:900}.score.good{color:#10805b}.score.mid{color:#8a6900}.score.low{color:#ba4545}
-.progress{height:8px;background:#eef2f3;border-radius:999px;overflow:hidden}.progress>span{display:block;height:100%;background:var(--green);border-radius:999px}
-.filters{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.filters input,.filters select{height:42px;border:1px solid var(--line);border-radius:11px;padding:0 12px;background:#fff;outline:none;min-width:180px}.filters input:focus,.filters select:focus{border-color:var(--green)}
-.drill{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px}.crumb{border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 11px;font-size:12px;font-weight:800;color:#586579;cursor:pointer}.crumb.active{background:var(--green-soft);color:var(--green-dark);border-color:#bdeedb}
-.person-head{display:flex;justify-content:space-between;gap:20px;align-items:flex-start;flex-wrap:wrap}.person-main{display:flex;gap:14px;align-items:center}.avatar{width:56px;height:56px;border-radius:16px;background:var(--navy);color:#fff;display:grid;place-items:center;font-weight:900;font-size:18px}.person-name{font-size:22px;font-weight:900}.person-meta{font-size:12px;color:var(--muted);margin-top:4px}.score-hero{font-size:44px;font-weight:950;color:var(--green)}
-.detail-grid{grid-template-columns:repeat(4,minmax(0,1fr))}.detail-item{padding:14px;border:1px solid var(--line);border-radius:14px;background:#fbfdfc}.detail-item .small{font-size:11px;color:var(--muted)}.detail-item .big{font-size:22px;font-weight:900;margin-top:3px}
-.question-card{border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:12px}.question-top{display:flex;justify-content:space-between;gap:12px}.q-text{font-weight:800;line-height:1.55}.answer-line{margin-top:10px;font-size:13px}.answer-line strong{font-weight:850}.answer-your{color:#a34747}.answer-correct{color:var(--green-dark)}.reference{margin-top:11px;padding:10px 12px;border-radius:10px;background:#f7faf9;border-left:4px solid var(--green);font-size:12px;color:#536173}
-.empty{padding:38px 15px;text-align:center;color:var(--muted)}.empty strong{color:var(--text);display:block;margin-bottom:6px}
-.alert{padding:12px 14px;border-radius:12px;font-size:13px;margin-bottom:16px}.alert.info{background:var(--blue-soft);color:#345f9b}.alert.warn{background:var(--amber-soft);color:#7f5a00}.alert.danger{background:var(--red-soft);color:#9c3f3f}
-.mobile-nav{display:none}.modal{position:fixed;inset:0;background:rgba(8,20,34,.45);z-index:50;display:grid;place-items:center;padding:18px}.modal-card{width:min(900px,100%);max-height:88vh;overflow:auto;background:#fff;border-radius:20px;padding:22px;box-shadow:0 24px 80px rgba(0,0,0,.25)}
-.mobile-overlay{display:none}.menu-toggle{display:none;border:0;background:transparent;color:var(--navy);font-size:24px;width:42px;height:42px;border-radius:12px}.topbar-left{display:flex;align-items:center;gap:10px}
-.mobile-list{display:none}.mobile-rank-card,.mobile-pending-card,.mobile-location-card{border:1px solid var(--line);background:#fff;border-radius:14px;padding:13px 14px;margin-bottom:10px;box-shadow:0 4px 12px rgba(15,27,45,.04)}.mobile-rank-head,.mobile-pending-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}.mobile-rank-num{width:28px;height:28px;border-radius:9px;background:var(--green-soft);color:var(--green-dark);display:grid;place-items:center;font-weight:900;flex:none}.mobile-rank-name{font-weight:850;line-height:1.35}.mobile-rank-meta,.mobile-pending-meta{font-size:11px;color:var(--muted);margin-top:4px;line-height:1.45}.mobile-rank-score{font-weight:950;font-size:20px;white-space:nowrap}.mobile-pending-card{cursor:pointer}.mobile-pending-card:hover{border-color:#cde9df}.mobile-location-card{cursor:pointer}.mobile-location-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:10px}.mobile-stat{padding:8px 9px;border-radius:10px;background:#f8fafb}.mobile-stat .small{font-size:10px;color:var(--muted)}.mobile-stat .big{font-size:15px;font-weight:850;margin-top:2px}
-
-@media (max-width:1200px){.kpis{grid-template-columns:repeat(3,minmax(0,1fr))}.two{grid-template-columns:1fr}.four{grid-template-columns:repeat(2,minmax(0,1fr))}.three{grid-template-columns:1fr}}
-@media (max-width:850px){.sidebar{display:flex;width:min(84vw,320px);transform:translateX(-105%);transition:transform .25s ease;box-shadow:18px 0 45px rgba(0,0,0,.18)}.sidebar.open{transform:translateX(0)}.mobile-overlay{display:block;position:fixed;inset:0;background:rgba(6,18,31,.42);z-index:15;opacity:0;pointer-events:none;transition:opacity .2s ease}.mobile-overlay.open{opacity:1;pointer-events:auto}.menu-toggle{display:grid;place-items:center}.main{margin-left:0;padding-bottom:16px;min-width:0}.topbar{height:68px;padding:0 12px;position:sticky}.topbar-left{min-width:0}.topbar-left>div:last-child{min-width:0}.page-title{font-size:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.page-sub{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.content{padding:16px 12px 26px;overflow-x:hidden}.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.detail-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.mobile-nav{display:none}.top-actions .role-chip{display:none}.logout{height:38px;padding:0 11px}.nav{overflow-y:auto;padding-bottom:24px}.sidebar-footer{padding-bottom:24px}.table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}.table{min-width:760px}.card{overflow:hidden}.filters{width:100%}.filters input,.filters select{min-width:0;width:100%}.mobile-list{display:none}}
-@media (max-width:560px){.kpis{grid-template-columns:1fr 1fr;gap:10px}.kpi{padding:14px}.kpi .value{font-size:24px}.detail-grid{grid-template-columns:1fr 1fr;gap:10px}.login-card{padding:26px}.content{padding:12px 10px 24px}.chart-wrap{height:235px}.card{padding:16px;border-radius:15px}.card-head{margin-bottom:14px}.table-wrap{display:none}.mobile-list{display:block}.mobile-rank-card{padding:12px}.mobile-rank-score{font-size:18px}.person-name{font-size:20px}.score-hero{font-size:36px}.question-card{padding:14px}.q-text{font-size:14px}.answer-line{font-size:12px}}
+.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:14px}.table{width:100%;border-collapse:collapse;min-width:760px}.table th,.table td{padding:12px 14px;border-bottom:1px solid #eef1f4;text-align:left;font-size:13px;vertical-align:top}.table th{background:#f8fafb;color:#5b687a;font-size:11px;text-transform:uppercase;letter-spacing:.04em;position:sticky;top:0;z-index:1}.table tr:hover td{background:#fbfdfc}.link{color:var(--green-dark);font-weight:800;text-decoration:none;cursor:pointer}.score{font-weight:900}.score.good{color:#10805b}.score.mid{color:#8a6900}.score.low{color:#ba4545}.change-up{color:#10805b;font-weight:850}.change-down{color:#ba4545;font-weight:850}.change-flat{color:#6b7280;font-weight:850}
+.progress{height:8px;background:#eef2f3;border-radius:999px;overflow:hidden}.progress>span{display:block;height:100%;background:var(--green);border-radius:999px}.filters{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.filters input,.filters select{height:42px;border:1px solid var(--line);border-radius:11px;padding:0 12px;background:#fff;outline:none;min-width:180px}.filters input:focus,.filters select:focus{border-color:var(--green)}.filters .compact-input{min-width:120px;width:120px}.filters .compact-select{min-width:150px}.low-perf-summary{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}.low-perf-summary .badge{font-size:12px}.title-special{font-size:12px;color:#b9c5d4;margin-top:4px;font-weight:700;line-height:1.35}
+.drill{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px}.crumb{border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 11px;font-size:12px;font-weight:800;color:#586579;cursor:pointer}.crumb.active{background:var(--green-soft);color:var(--green-dark);border-color:#bdeedb}.person-head{display:flex;justify-content:space-between;gap:20px;align-items:flex-start;flex-wrap:wrap}.person-main{display:flex;gap:14px;align-items:center}.avatar{width:56px;height:56px;border-radius:16px;background:var(--navy);color:#fff;display:grid;place-items:center;font-weight:900;font-size:18px}.person-name{font-size:22px;font-weight:900}.person-meta{font-size:12px;color:var(--muted);margin-top:4px}.score-hero{font-size:44px;font-weight:950;color:var(--green)}.detail-grid{grid-template-columns:repeat(5,minmax(0,1fr))}.detail-item{padding:14px;border:1px solid var(--line);border-radius:14px;background:#fbfdfc}.detail-item .small{font-size:11px;color:var(--muted)}.detail-item .big{font-size:22px;font-weight:900;margin-top:3px}
+.question-card{border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:12px}.question-top{display:flex;justify-content:space-between;gap:12px}.q-text{font-weight:800;line-height:1.55}.answer-line{margin-top:10px;font-size:13px}.answer-your{color:#a34747}.answer-correct{color:var(--green-dark)}.reference{margin-top:11px;padding:10px 12px;border-radius:10px;background:#f7faf9;border-left:4px solid var(--green);font-size:12px;color:#536173;line-height:1.55}.empty{padding:38px 15px;text-align:center;color:var(--muted)}.empty strong{color:var(--text);display:block;margin-bottom:6px}.alert{padding:12px 14px;border-radius:12px;font-size:13px;margin-bottom:16px;line-height:1.6}.alert.info{background:var(--blue-soft);color:#345f9b}.alert.warn{background:var(--amber-soft);color:#7f5a00}.alert.danger{background:var(--red-soft);color:#9c3f3f}.stat-line{display:flex;justify-content:space-between;gap:14px;padding:11px 0;border-bottom:1px solid #eef1f4}.stat-line:last-child{border-bottom:0}.split{display:grid;grid-template-columns:1fr 1fr;gap:12px}.movement-card{border:1px solid var(--line);border-radius:14px;padding:14px;background:#fbfdfc}.movement-card .title{font-size:12px;color:var(--muted)}.movement-card .value{font-size:24px;font-weight:900;margin-top:6px}.small-table{min-width:0}.small-table th,.small-table td{padding:10px 11px;font-size:12px}.mobile-nav{display:none}.modal{position:fixed;inset:0;background:rgba(8,20,34,.45);z-index:70;display:grid;place-items:center;padding:18px}.modal-card{width:min(1100px,100%);max-height:90vh;overflow:auto;background:#fff;border-radius:20px;padding:22px;box-shadow:0 24px 80px rgba(0,0,0,.25)}.mobile-overlay{display:none}.menu-toggle{display:none;border:0;background:transparent;color:var(--navy);font-size:24px;width:42px;height:42px;border-radius:12px}
+.security-note{border-left:4px solid var(--amber);background:var(--amber-soft);padding:12px 14px;border-radius:12px;font-size:13px;color:#7f5a00;margin-bottom:16px}.device-card{border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:12px;background:#fbfdfc}.device-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.device-id{font-weight:900;color:var(--navy)}.device-meta{font-size:12px;color:var(--muted);margin-top:4px;line-height:1.55}.code-list{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}.code-pill{padding:6px 9px;border-radius:999px;background:#fff;border:1px solid var(--line);font-size:11px;font-weight:800}
+@media(max-width:1200px){.kpis{grid-template-columns:repeat(3,minmax(0,1fr))}.detail-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:850px){.sidebar{transform:translateX(-105%);transition:transform .22s ease}.sidebar.open{transform:translateX(0)}.main{margin-left:0}.menu-toggle{display:inline-grid;place-items:center}.topbar{padding:0 16px;height:auto;min-height:72px;gap:10px}.top-actions{gap:6px}.period-select{max-width:165px}.content{padding:18px 16px 32px}.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.two,.three,.four,.split{grid-template-columns:1fr}.detail-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.chart-wrap{height:270px}.mobile-overlay.open{display:block;position:fixed;inset:0;background:rgba(8,20,34,.38);z-index:35}.table-wrap{border-radius:12px}.page-title{font-size:18px}.page-sub{font-size:11px}.mobile-nav{display:none}}
+@media(max-width:520px){.login-card{padding:26px 20px}.kpis{grid-template-columns:1fr}.detail-grid{grid-template-columns:1fr}.topbar{flex-wrap:wrap;padding-top:12px;padding-bottom:12px}.topbar-left{width:100%}.top-actions{width:100%;justify-content:flex-end;flex-wrap:wrap}.top-actions .logout{padding:0 10px}.period-select{min-width:0;max-width:145px;flex:1 1 145px}}
 </style>
 </head>
 <body>
-<div id="loginView">
+<section id="loginView">
   <div class="login-card">
-    <div class="brand-mark" aria-hidden="true">
-      <svg viewBox="0 0 48 48" width="34" height="34" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect x="10" y="8" width="24" height="31" rx="4" stroke="white" stroke-width="3"/>
-        <path d="M16 16H28M16 23H28" stroke="white" stroke-width="3" stroke-linecap="round"/>
-        <path d="M16 31V27M21 31V24M26 31V21" stroke="white" stroke-width="3" stroke-linecap="round"/>
-        <path d="M14 8C14 5.8 15.8 4 18 4H30C32.2 4 34 5.8 34 8" stroke="white" stroke-width="3" stroke-linecap="round"/>
-      </svg>
+    <div class="brand-mark">✓</div>
+    <h1>Employee Assessment Portal</h1>
+    <p class="subtitle">Monthly performance, completion and history</p>
+    <div class="field">
+      <label for="loginCode">Functional Code</label>
+      <input id="loginCode" type="text" inputmode="numeric" autocomplete="off" placeholder="Enter functional code" />
     </div>
-    <h1>Questionnaire Result Portal</h1>
-    <p>أدخل الكود الوظيفي للوصول إلى نتيجة الاختبار والصلاحيات.</p>
-    <div class="field"><label for="loginCode">الكود الوظيفي</label><input id="loginCode" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" enterkeyhint="done" placeholder="اكتب الكود الوظيفي" /></div>
-    <button class="primary" id="loginBtn">دخول</button>
     <div id="loginError" class="error hidden"></div>
+    <button id="loginBtn" class="primary">Login</button>
   </div>
-</div>
+</section>
 
 <div id="app" class="hidden">
-  <div class="mobile-overlay" id="mobileOverlay"></div>
   <aside class="sidebar" id="sidebar">
-    <div class="sidebar-header"><div class="logo-row"><div class="mini-mark" id="sideUserInitial">A</div><div><div class="logo-title">Questionnaire Portal</div><div class="logo-sub">Results &amp; Performance</div></div></div></div>
-    <div class="user-box"><div class="user-name" id="sideUserName"></div><div class="user-meta" id="sideUserMeta"></div></div>
+    <div class="sidebar-header">
+      <div class="logo-row"><div class="mini-mark">✓</div><div><div class="logo-title">Assessment Portal</div><div class="logo-sub">August + September 2026</div></div></div>
+    </div>
+    <div class="user-box"><div id="sideUserName" class="user-name"></div><div id="sideUserTitle" class="title-special hidden"></div><div id="sideUserMeta" class="user-meta"></div></div>
     <nav class="nav" id="sideNav"></nav>
-    <div class="sidebar-footer">Temporary management portal · Data-driven<br><span id="sessionNote">Login session: 1 hour</span></div>
+    <div class="sidebar-footer">Monthly employee assessment reporting<br><span id="sessionNote">Login session: 1 hour</span></div>
   </aside>
+  <div id="mobileOverlay" class="mobile-overlay"></div>
   <main class="main">
-    <header class="topbar"><div class="topbar-left"><button class="menu-toggle" id="menuToggle" aria-label="فتح القائمة" aria-expanded="false">☰</button><div><div class="page-title" id="pageTitle"></div><div class="page-sub" id="pageSub"></div></div></div><div class="top-actions"><span id="roleChip" class="badge green role-chip"></span><button class="logout" id="logoutBtn">Logout</button></div></header>
-    <div class="content" id="content"></div>
+    <header class="topbar">
+      <div class="topbar-left"><button class="menu-toggle" id="menuToggle" aria-label="Open menu" aria-expanded="false">☰</button><div><div id="pageTitle" class="page-title"></div><div id="pageSub" class="page-sub"></div></div></div>
+      <div class="top-actions"><select id="periodSelect" class="period-select" aria-label="Assessment period"></select><span id="roleChip" class="badge green"></span><button id="logoutBtn" class="logout">Logout</button></div>
+    </header>
+    <div id="content" class="content"></div>
   </main>
-  <nav class="mobile-nav" id="mobileNav"></nav>
 </div>
-<div id="modal" class="modal hidden"></div>
 
 <script>
-const DATA = { results:null, hierarchy:null, questions:null };
-const STATE = { user:null, page:'dashboard', returnPage:'performance', drill:{type:null,value:null}, selectedEmployee:null, charts:{} };
-const SESSION_KEY = 'assessmentPortalSession';
-const SESSION_TTL_MS = 60 * 60 * 1000;
-const $ = (s)=>document.querySelector(s);
-const $$ = (s)=>Array.from(document.querySelectorAll(s));
+const DATA={months:{},questions:{},hierarchies:{},allResults:[]};
+const STATE={user:null,page:'dashboard',period:null,previousPeriod:null,selectedEmployee:null,selectedLocation:null,returnPage:'performance',charts:{},lowPerf:null};
+const SESSION_KEY='assessmentPortalSession_v3';
+const SESSION_TTL_MS=60*60*1000;
+const SECURITY_AUDIT_CODES=new Set(['30020897']);
+const $=id=>document.getElementById(id);
+const $$=selector=>Array.from(document.querySelectorAll(selector));
 
-const NAV = [
-  ['dashboard','Dashboard'],['performance','Performance'],['pending','Pending Employees'],['locations','Locations'],['questions','Question Reference'],['quality','Data Quality']
-];
-
-function norm(v){ return String(v??'').trim(); }
-function code(v){ return norm(v).replace(/\.0$/,''); }
-function esc(s){return String(s??'').replace(/[&<>'"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[m]));}
-function lower(s){return norm(s).toLowerCase();}
-function isEligible(row){return /(^|[^a-z])(lead|supervisor)([^a-z]|$)/i.test(norm(row.Position));}
-function pct(v){const n=Number(v); return Number.isFinite(n)?`${n.toFixed(1).replace(/\.0$/,'')}%`:'—';}
-function scoreClass(v){const n=Number(v);return n>=85?'good':n>=70?'mid':'low';}
-function initials(name){return norm(name).split(/\s+/).filter(Boolean).slice(0,2).map(x=>x[0]).join('').toUpperCase()||'A';}
-function average(rows, field='score_percentage'){const vals=rows.map(r=>Number(r[field])).filter(Number.isFinite);return vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:0;}
-function mean(arr){return arr.length?arr.reduce((a,b)=>a+b,0)/arr.length:0;}
-function groupBy(rows, keyFn){const m=new Map(); for(const r of rows){const k=keyFn(r); if(!m.has(k))m.set(k,[]);m.get(k).push(r)} return m;}
-function resultsMap(){const m=new Map(); DATA.results.forEach(r=>m.set(code(r.functional_code),r)); return m;}
-function hierarchyMap(){const m=new Map(); DATA.hierarchy.forEach(r=>m.set(code(r['Functional Code']),r)); return m;}
-
-function correctText(i){const q=DATA.questions[i-1]; return q?.['Correct Answer']||'';}
-function optionText(i, letter){const q=DATA.questions[i-1]; return q?.[`Option ${letter}`]||'';}
-function questionRow(i){return DATA.questions[i-1];}
-function productForQuestion(i){const s=questionRow(i)?.Section||''; if(s.includes('المتناهي'))return 'MF'; if(s.includes('الاستهلاكي'))return 'CF'; if(s.includes('الجمعية'))return 'Gam3ya'; if(s.includes('الاستثمار'))return 'Investment'; return s;}
-const PRODUCT_QS = {MF:[1,2,3,4,5],CF:[6,7,8,9,10],Gam3ya:[11,12,13],Investment:[14,15,16,17,18]};
-
-function enrich(){
-  const hm=hierarchyMap(), rm=resultsMap();
-  for(const h of DATA.hierarchy){h._code=code(h['Functional Code']); h._eligible=isEligible(h); h._access=norm(h['Access Level'])|| (h._eligible?'Lead / Supervisor':''); h._scopeOwnerCode=code(h['Scope Owner Code']);}
-  for(const r of DATA.results){r._code=code(r.functional_code); r._h=hm.get(r._code)||null; r._eligible=!!r._h&&r._h._eligible; r._displayName=r._h?norm(r._h['Employee Name']):norm(r.participant_name); r._score=Number(r.score_percentage)||0; r._products={}; for(const [p,qs] of Object.entries(PRODUCT_QS)){let c=0; for(const i of qs){if(lower(r[`q${i}`])===lower(DATA.questions[i-1]['Correct Option']))c++;} r._products[p]=c/qs.length*100;} }
+const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+const norm=v=>String(v??'').trim();
+const code=v=>norm(v).replace(/\.0$/,'');
+const lower=v=>norm(v).toLowerCase();
+const pct=v=>{const n=Number(v);return Number.isFinite(n)?`${n.toFixed(1).replace(/\.0$/,'')}%`:'—';};
+const scoreClass=v=>{const n=Number(v);return n>=85?'good':n>=70?'mid':'low';};
+const initials=name=>norm(name).split(/\s+/).filter(Boolean).slice(0,2).map(x=>x[0]).join('').toUpperCase()||'A';
+const average=rows=>{const vals=rows.map(r=>Number(r?._score ?? r?.score_percentage)).filter(Number.isFinite);return vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:0;};
+const displayMonth=p=>p==='Sep 2026'?'September 2026':p;
+function parseDate(v){
+  if(v===null||v===undefined||v==='')return null;
+  if(typeof v==='number'&&Number.isFinite(v)) return new Date((v-25569)*86400000);
+  const d=new Date(v); return Number.isNaN(d.getTime())?null:d;
 }
-
-async function loadXlsx(url,sheetName){const ab=await fetch(url).then(r=>{if(!r.ok)throw new Error(`Failed to fetch ${url}`);return r.arrayBuffer()}); const wb=XLSX.read(ab,{type:'array'}); const ws=wb.Sheets[sheetName||wb.SheetNames[0]]; return XLSX.utils.sheet_to_json(ws,{defval:''});}
-async function loadCsv(url){const txt=await fetch(url).then(r=>{if(!r.ok)throw new Error(`Failed to fetch ${url}`);return r.text()}); const wb=XLSX.read(txt,{type:'string'}); const ws=wb.Sheets[wb.SheetNames[0]]; return XLSX.utils.sheet_to_json(ws,{defval:''});}
-async function boot(){
-  try{
-    const [results,hier,questions]=await Promise.all([
-      loadCsv('results.csv'), loadXlsx('hierarchy.xlsx','Hierarchy'), loadXlsx('question_bank.xlsx','Question Bank')
-    ]);
-    DATA.results=results; DATA.hierarchy=hier; DATA.questions=questions; enrich();
-    $('#loginBtn').addEventListener('click',login); $('#loginCode').addEventListener('keydown',e=>{if(e.key==='Enter')login()});
-    restoreSession();
-  }catch(err){$('#loginError').textContent='تعذر تحميل ملفات البيانات. تأكد أن الملفات موجودة بجوار index.html في GitHub.';$('#loginError').classList.remove('hidden');console.error(err)}
+function dateMs(v){const d=parseDate(v);return d?d.getTime():0;}
+function formatDateTime(v){const d=parseDate(v);if(!d)return '—';return new Intl.DateTimeFormat('en-GB',{dateStyle:'medium',timeStyle:'short'}).format(d);}
+function isCompleted(r){const s=norm(r?.result_status);return !s||s==='Completed';}
+function isEligible(h){return /(^|[^a-z])(lead|supervisor)([^a-z]|$)/i.test(norm(h?.Position));}
+function sectionKey(section){const s=norm(section); if(s==='MF'||s.includes('المتناهي'))return 'MF'; if(s==='CF'||s.includes('الاستهلاكي'))return 'CF'; if(s==='Gam3ya'||s.includes('الجمعية'))return 'Gam3ya'; if(s==='Investment'||s.includes('الاستثمار'))return 'Investment'; return s;}
+function sectionLabel(key){return ({MF:'MF',CF:'CF',Gam3ya:'Gam3ya',Investment:'Investment'})[key]||key||'—';}
+function monthOrder(a,b){const order={'August 2026':202608,'Sep 2026':202609,'September 2026':202609}; return (order[a]||0)-(order[b]||0);}
+function periods(){return Object.keys(DATA.months).sort(monthOrder);}
+function hierarchyFor(period){return DATA.hierarchies[period]||[];}
+function hierarchyMap(period){const m=new Map();hierarchyFor(period).forEach(h=>m.set(code(h['Functional Code']),h));return m;}
+function employeeFromAnyHierarchy(c){for(const p of periods().slice().sort((a,b)=>monthOrder(b,a))){const h=hierarchyMap(p).get(code(c));if(h)return h;}return null;}
+function latestRawByCode(period){
+  const rows=(DATA.months[period]?.results||[]).filter(r=>code(r.functional_code));
+  const m=new Map();
+  for(const r of rows){const c=code(r.functional_code);const prev=m.get(c);if(!prev||dateMs(r.completion_timestamp||r.start_timestamp)>=dateMs(prev.completion_timestamp||prev.start_timestamp))m.set(c,r);}return m;
 }
-
-function findUser(c){return DATA.hierarchy.find(h=>code(h['Functional Code'])===code(c));}
-function roleOf(u){const al=norm(u['Access Level']); if(al==='Director / Head')return 'Director / Head'; if(al==='Regional Manager')return 'Regional Manager'; if(al==='City Manager')return 'City Manager'; if(u._eligible)return 'Lead / Supervisor'; return al||'Viewer';}
-function descendants(userCode){
-  const by=new Map(); for(const h of DATA.hierarchy){const p=code(h['Direct Manager Code']);if(!by.has(p))by.set(p,[]);by.get(p).push(h);}
-  const out=[]; const stack=[code(userCode)]; const seen=new Set(); while(stack.length){const x=stack.pop(); if(seen.has(x))continue;seen.add(x); for(const child of (by.get(x)||[])){out.push(child);stack.push(child._code)}} return out;
+function latestCompletedByCode(period){
+  const rows=(DATA.months[period]?.results||[]).filter(r=>code(r.functional_code)&&isCompleted(r));
+  const m=new Map();
+  for(const r of rows){const c=code(r.functional_code);const prev=m.get(c);if(!prev||dateMs(r.completion_timestamp||r.start_timestamp)>=dateMs(prev.completion_timestamp||prev.start_timestamp))m.set(c,r);}return m;
 }
-function scopeOwnerUser(user){ const ownerCode=code(user['Scope Owner Code']); if(!ownerCode) return user; return hierarchyMap().get(ownerCode)||user; }
-function visibleEmployees(user){
-  const owner=scopeOwnerUser(user);
-  const role=roleOf(owner);
-  if(role==='Director / Head')return DATA.hierarchy.slice();
-  if(role==='Regional Manager'||role==='City Manager')return descendants(owner._code);
-  return [owner];
+function previousPeriod(period){const ps=periods();const i=ps.indexOf(period);return i>0?ps[i-1]:null;}
+function computeCorrect(r,qs){let c=0;for(let i=1;i<=qs.length;i++){if(norm(r[`q${i}`]).toUpperCase()===norm(qs[i-1]?.['Correct Option']).toUpperCase())c++;}return c;}
+function enrichResult(r,period){
+  const hmap=hierarchyMap(period), h=hmap.get(code(r.functional_code))||null, qs=DATA.questions[period]||[];
+  const score=Number(r.score_percentage);
+  const computed=qs.length?Math.round(computeCorrect(r,qs)/qs.length*10000)/100:NaN;
+  const finalScore=Number.isFinite(score)?score:(Number.isFinite(computed)?computed:NaN);
+  const products={};
+  for(const p of ['MF','CF','Gam3ya','Investment']){
+    const idxs=qs.map((q,i)=>sectionKey(q.Section)===p?i+1:null).filter(Boolean);
+    const good=idxs.filter(i=>norm(r[`q${i}`]).toUpperCase()===norm(qs[i-1]?.['Correct Option']).toUpperCase()).length;
+    products[p]=idxs.length?good/idxs.length*100:NaN;
+  }
+  return {...r,_period:period,_code:code(r.functional_code),_h:h,_eligible:!!h&&isEligible(h),_displayName:h?norm(h['Employee Name']):norm(r.participant_name)||code(r.functional_code),_score:finalScore,_products:products,_computedScore:computed};
 }
-function scopeEmployees(user){return visibleEmployees(user).filter(h=>h._eligible);}
-function scopeSubmittedResults(user){const m=resultsMap(); return visibleEmployees(user).map(h=>m.get(h._code)).filter(Boolean);}
-function scopePopulationRecords(user){
-  const eligible=scopeEmployees(user);
-  const submitted=scopeSubmittedResults(user);
-  const map=new Map();
-  for(const h of eligible) map.set(h._code,{code:h._code,h,result:null,eligible:true,submitted:false});
-  for(const r of submitted){ if(!map.has(r._code)) map.set(r._code,{code:r._code,h:r._h||null,result:r,eligible:false,submitted:true}); else {const x=map.get(r._code); x.result=r; x.submitted=true;} }
+function currentResults(period){return Array.from(latestCompletedByCode(period).values()).map(r=>enrichResult(r,period));}
+function rawResults(period){return (DATA.months[period]?.results||[]).filter(r=>code(r.functional_code)).map(r=>enrichResult(r,period));}
+function visibleEmployees(user,period){
+  const hs=hierarchyFor(period);
+  const map=new Map(hs.map(h=>[code(h['Functional Code']),h]));
+  const userCode=code(user?.['Functional Code']);
+  const periodUser=map.get(userCode)||null;
+  const source=periodUser||user;
+  const role=roleOf(source);
+  if(role==='Director / Head')return hs.slice();
+  const ownerCode=code(source?.['Scope Owner Code']);
+  const owner=ownerCode?(map.get(ownerCode)||source):source;
+  if(role==='Regional Manager'||role==='City Manager'){
+    const by=new Map();for(const h of hs){const p=code(h['Direct Manager Code']);if(!by.has(p))by.set(p,[]);by.get(p).push(h);}
+    const out=[];const stack=[code(owner?.['Functional Code'])];const seen=new Set();
+    while(stack.length){const x=stack.pop();if(seen.has(x))continue;seen.add(x);for(const child of (by.get(x)||[])){out.push(child);stack.push(code(child['Functional Code']));}}
+    return out;
+  }
+  return owner?[owner]:[];
+}
+function scopeEmployees(user,period){return visibleEmployees(user,period).filter(isEligible);}
+function scopeSubmittedResults(user,period){
+  const all=currentResults(period), role=roleOf(user);
+  if(role==='Director / Head')return all;
+  const visible=new Set(visibleEmployees(user,period).map(h=>code(h['Functional Code'])));
+  return all.filter(r=>visible.has(r._code));
+}
+function scopePopulationRecords(user,period){
+  const eligible=scopeEmployees(user,period);const submitted=scopeSubmittedResults(user,period);const map=new Map();
+  for(const h of eligible){const c=code(h['Functional Code']);map.set(c,{code:c,h,result:null,eligible:true,submitted:false});}
+  for(const r of submitted){if(!map.has(r._code))map.set(r._code,{code:r._code,h:r._h||null,result:r,eligible:false,submitted:true});else{const x=map.get(r._code);x.result=r;x.submitted=true;}}
   return Array.from(map.values());
 }
-function scopeResults(user){return scopeSubmittedResults(user);}
-function scopePopulationCount(user){return scopePopulationRecords(user).length;}
-function pendingEmployees(user){const res=resultsMap(); return scopeEmployees(user).filter(h=>!res.has(h._code));}
-
-function saveSession(user){localStorage.setItem(SESSION_KEY,JSON.stringify({code:user._code,expiresAt:Date.now()+SESSION_TTL_MS}));}
+function pendingEmployees(user,period){const completed=latestCompletedByCode(period);return scopeEmployees(user,period).filter(h=>!completed.has(code(h['Functional Code'])));}
+function findUser(c){return hierarchyFor('Sep 2026').find(h=>code(h['Functional Code'])===code(c))||hierarchyFor('September 2026').find(h=>code(h['Functional Code'])===code(c));}
+function roleOf(u){const al=norm(u?.['Access Level']);if(al==='Director / Head')return 'Director / Head';if(al==='Regional Manager')return 'Regional Manager';if(al==='City Manager')return 'City Manager';if(u&&isEligible(u))return 'Lead / Supervisor';return al||'Viewer';}
+function canAccessEmployee(h,period){
+  const role=roleOf(STATE.user);
+  if(role==='Director / Head')return true;
+  return visibleEmployees(STATE.user,period).some(x=>code(x['Functional Code'])===code(h['Functional Code']));
+}
+function saveSession(user){localStorage.setItem(SESSION_KEY,JSON.stringify({code:code(user['Functional Code']),expiresAt:Date.now()+SESSION_TTL_MS}));}
 function clearSession(){localStorage.removeItem(SESSION_KEY);}
-function restoreSession(){
-  try{
-    const raw=localStorage.getItem(SESSION_KEY);
-    if(!raw)return false;
-    const session=JSON.parse(raw);
-    if(!session || !session.code || Number(session.expiresAt)<=Date.now()){clearSession();return false;}
-    const u=findUser(session.code);
-    if(!u){clearSession();return false;}
-    STATE.user=u;
-    $('#loginView').classList.add('hidden');
-    $('#app').classList.remove('hidden');
-    renderShell();
-    render();
-    return true;
-  }catch(e){clearSession();return false;}
+function updateSessionNote(){const raw=localStorage.getItem(SESSION_KEY);if(!raw){$('sessionNote').textContent='Login session: 1 hour';return;}try{const s=JSON.parse(raw);const mins=Math.max(0,Math.ceil((Number(s.expiresAt)-Date.now())/60000));$('sessionNote').textContent=`Login session: ${mins} min remaining`;}catch{$('sessionNote').textContent='Login session: 1 hour';}}
+function restoreSession(){try{const raw=localStorage.getItem(SESSION_KEY);if(!raw)return;const s=JSON.parse(raw);if(!s?.code||Number(s.expiresAt)<=Date.now()){clearSession();return;}const u=findUser(s.code);if(!u){clearSession();return;}STATE.user=u;enterApp();}catch{clearSession();}}
+function enterApp(){
+  $('loginView').classList.add('hidden');$('app').classList.remove('hidden');STATE.page='dashboard';STATE.period=periods().slice(-1)[0]||null;STATE.previousPeriod=previousPeriod(STATE.period);STATE.selectedEmployee=null;STATE.selectedLocation=null;renderShell();render();
 }
-function login(){const c=code($('#loginCode').value); if(!c){showLoginError('من فضلك اكتب الكود الوظيفي.');return;} const u=findUser(c); if(!u){showLoginError('الكود الوظيفي غير موجود في قاعدة البيانات.');return;} STATE.user=u; STATE.page='dashboard'; saveSession(u); $('#loginView').classList.add('hidden');$('#app').classList.remove('hidden');renderShell();render();}
-function showLoginError(t){$('#loginError').textContent=t;$('#loginError').classList.remove('hidden')}
-function logout(){clearSession();STATE.user=null;Object.assign(STATE,{page:'dashboard',returnPage:'performance',drill:{type:null,value:null},selectedEmployee:null});$('#app').classList.add('hidden');$('#loginView').classList.remove('hidden');$('#loginCode').value='';$('#loginError').classList.add('hidden');}
-function updateSessionNote(){const el=$('#sessionNote');if(!el)return;try{const raw=localStorage.getItem(SESSION_KEY);const x=raw?JSON.parse(raw):null; if(!x){el.textContent='Login session: 1 hour';return;} const mins=Math.max(0,Math.ceil((Number(x.expiresAt)-Date.now())/60000)); el.textContent=`Login session: ${mins} min remaining`;}catch(e){el.textContent='Login session: 1 hour';}}
-function renderShell(){const u=STATE.user, role=roleOf(u); $('#sideUserName').textContent=u['Employee Name']; $('#sideUserMeta').textContent=`${role} · ${u['Governorate']||'—'}`; $('#roleChip').textContent=role; $('#sideUserInitial').textContent=initials(u['Employee Name']).slice(0,1)||'A'; buildNav(); $('#logoutBtn').onclick=logout; updateSessionNote();}
-function closeMobileMenu(){const sb=$('#sidebar'),ov=$('#mobileOverlay'),btn=$('#menuToggle');sb?.classList.remove('open');ov?.classList.remove('open');btn?.setAttribute('aria-expanded','false');}
-function allowedNav(){const r=roleOf(STATE.user);if(r==='Lead / Supervisor')return ['dashboard','questions'];return ['dashboard','performance','pending','locations','questions','quality'];}
-function buildNav(){const allowed=allowedNav(); const mk=(btn)=>`<button data-nav="${btn[0]}" class="${STATE.page===btn[0]?'active':''}"><span class="dot"></span>${esc(btn[1])}</button>`; $('#sideNav').innerHTML=NAV.filter(x=>allowed.includes(x[0])).map(mk).join(''); $('#mobileNav').innerHTML=''; [...$$('#sideNav button')].forEach(b=>b.onclick=()=>{STATE.page=b.dataset.nav; STATE.drill={type:null,value:null}; STATE.selectedEmployee=null; closeMobileMenu(); render()});}
-function setHeader(title,sub){$('#pageTitle').textContent=title;$('#pageSub').textContent=sub||'';}
-
-function render(){buildNav(); const r=roleOf(STATE.user); if(STATE.page==='dashboard'){setHeader(r==='Lead / Supervisor'?'My Assessment':'Management Dashboard', r==='Lead / Supervisor'?'Assessment result and learning feedback':'Performance, completion and hierarchy insights'); renderDashboard();}
-else if(STATE.page==='performance') {setHeader('Performance','Scores, products and rankings within your authorized scope'); renderPerformance();}
-else if(STATE.page==='pending'){setHeader('Pending Employees','Employees who are required to test but have no submitted result');renderPending();}
-else if(STATE.page==='locations'){setHeader('Locations','Drill down through your authorized hierarchy');renderLocations();}
-else if(STATE.page==='questions'){setHeader('Question Reference','Correct answers and training references');renderQuestions();}
-else if(STATE.page==='quality'){setHeader('Data Quality','Cross-check of results, hierarchy and answer mapping');renderQuality();}
-else if(STATE.page==='employee' && STATE.selectedEmployee){renderEmployeeDetail(STATE.selectedEmployee,false);}}
-
-function renderDashboard(){ if(roleOf(STATE.user)==='Lead / Supervisor'){renderEmployeeDashboard(STATE.user);return;} const population=scopePopulationRecords(STATE.user); const results=scopeResults(STATE.user); const pending=pendingEmployees(STATE.user); const total=population.length; const avg=average(results); const completion=total?results.length/total*100:0;
-  $('#content').innerHTML=`<div class="grid kpis"><div class="kpi green"><div class="label">Total People</div><div class="value">${total}</div><div class="hint">Required population + actual submissions</div></div><div class="kpi"><div class="label">Completed</div><div class="value">${results.length}</div><div class="hint">Actual submitted results</div></div><div class="kpi red"><div class="label">Not Completed</div><div class="value">${pending.length}</div><div class="hint">Required employees without results</div></div><div class="kpi green"><div class="label">Completion Rate</div><div class="value">${pct(completion)}</div><div class="hint">Completed ÷ total population</div></div><div class="kpi"><div class="label">Average Score</div><div class="value">${pct(avg)}</div><div class="hint">All completed submissions</div></div></div><div class="grid two" style="margin-top:16px"><div class="card"><div class="card-head"><div><h3>Product Performance</h3><div class="section-note">Average across completed submissions</div></div></div><div class="chart-wrap"><canvas id="productChart"></canvas></div></div><div class="card"><div class="card-head"><div><h3>Completion Overview</h3><div class="section-note">Your authorized population</div></div></div><div class="chart-wrap"><canvas id="completionChart"></canvas></div></div></div><div id="dashboardTables" style="margin-top:16px"></div>`;
-  createProductChart(results);createCompletionChart(results.length,pending.length);try{renderDashboardTables(population,results,pending);}catch(e){console.error('Dashboard tables error:',e);$('#dashboardTables').innerHTML='<div class=\"card\"><div class=\"empty\">تعذر تحميل تفاصيل الـDashboard. راجع Console للتفاصيل.</div></div>';} wireEmployeeLinks();}
-
-function renderEmployeeDashboard(user){const rm=resultsMap();const r=rm.get(user._code); if(!r){setHeader('My Assessment','Your assessment status');$('#content').innerHTML=`<div class="card empty"><strong>لم يتم تسجيل الاختبار بعد</strong><div>الكود الوظيفي: ${esc(user._code)}</div><div class="muted" style="margin-top:8px">أنت ضمن الفئة المطلوبة للاختبار، لكن لا يوجد Submission مطابق حتى الآن.</div></div>`;return;} renderEmployeeDetail(r._code,true);}
-function createProductChart(rows){const vals=Object.entries(PRODUCT_QS).map(([p])=>mean(rows.map(r=>r._products[p]))); if(STATE.charts.product)STATE.charts.product.destroy();STATE.charts.product=new Chart($('#productChart'),{type:'bar',data:{labels:['MF','CF','الجمعية','Investment'],datasets:[{data:vals,backgroundColor:['#00A970','#2e8bff','#7b61ff','#f2a900'],borderRadius:8}]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{min:0,max:100,ticks:{callback:v=>v+'%'}},x:{grid:{display:false}}},plugins:{legend:{display:false}}}})}
-function createCompletionChart(done,pending){if(STATE.charts.completion)STATE.charts.completion.destroy();STATE.charts.completion=new Chart($('#completionChart'),{type:'doughnut',data:{labels:['Completed','Not Completed'],datasets:[{data:[done,pending],backgroundColor:['#00A970','#e8edf1'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,cutout:'72%',plugins:{legend:{position:'bottom'}}}})}
-function rankBy(rows,keyFn){
-  const groups=new Map();
-  for(const row of rows){
-    const name=String(keyFn(row)||'—').trim()||'—';
-    if(!groups.has(name)) groups.set(name,[]);
-    groups.get(name).push(row);
-  }
-  return Array.from(groups.entries()).map(([name,rs])=>({name,count:rs.length,avg:average(rs)})).filter(x=>x.count>0).sort((a,b)=>b.avg-a.avg||b.count-a.count||a.name.localeCompare(b.name));
+function login(){const c=code($('loginCode').value);$('loginError').classList.add('hidden');if(!c){showLoginError('Please enter your functional code.');return;}const u=findUser(c);if(!u){showLoginError('Functional code was not found in the hierarchy.');return;}STATE.user=u;saveSession(u);enterApp();}
+function showLoginError(t){$('loginError').textContent=t;$('loginError').classList.remove('hidden');}
+function logout(){clearSession();STATE.user=null;$('app').classList.add('hidden');$('loginView').classList.remove('hidden');$('loginCode').value='';$('loginError').classList.add('hidden');}
+function setHeader(title,sub){$('pageTitle').textContent=title;$('pageSub').textContent=sub||'';}
+function allowedNav(){const base=[['dashboard','Dashboard'],['performance','Performance'],['persistentLow','Persistent Low Performers'],['pending','Pending Employees'],['locations','Locations'],['questions','Question Reference'],['history','Monthly History'],['quality','Data Quality']];if(SECURITY_AUDIT_CODES.has(code(STATE.user?.['Functional Code'])))base.push(['security','Device Abuse']);if(roleOf(STATE.user)==='Lead / Supervisor')return [['dashboard','My Assessment'],['questions','Question Reference']];return base;}
+function buildNav(){const allowed=allowedNav();$('sideNav').innerHTML=allowed.map(([id,label])=>`<button data-nav="${id}" class="${STATE.page===id?'active':''}"><span class="dot"></span>${esc(label)}</button>`).join('');$$('#sideNav button').forEach(b=>b.onclick=()=>{STATE.page=b.dataset.nav;STATE.selectedEmployee=null;STATE.selectedLocation=null;closeMobileMenu();render();});}
+function specialDisplayTitle(u){return code(u?.['Functional Code'])==='30020000'?'Sr. VP Operations Excellence':'';}
+function displayRoleChip(u){return specialDisplayTitle(u)||roleOf(u);}
+function renderShell(){const u=STATE.user;const role=roleOf(u),special=specialDisplayTitle(u);$('sideUserName').textContent=u['Employee Name']||code(u['Functional Code']);$('sideUserTitle').textContent=special; $('sideUserTitle').classList.toggle('hidden',!special); $('sideUserMeta').textContent=`${role} · ${u['Governorate']||'—'}`;$('roleChip').textContent=displayRoleChip(u);populatePeriodSelect();$('logoutBtn').onclick=logout;updateSessionNote();}
+function populatePeriodSelect(){const ps=periods();$('periodSelect').innerHTML=ps.map(p=>`<option value="${esc(p)}">${esc(displayMonth(p))}</option>`).join('');$('periodSelect').value=STATE.period||ps.slice(-1)[0]||'';$('periodSelect').onchange=()=>{STATE.period=$('periodSelect').value;STATE.previousPeriod=previousPeriod(STATE.period);STATE.selectedEmployee=null;STATE.selectedLocation=null;render();};}
+function closeMobileMenu(){$('sidebar').classList.remove('open');$('mobileOverlay').classList.remove('open');$('menuToggle').setAttribute('aria-expanded','false');}
+function render(){
+  buildNav();populatePeriodSelect();const role=roleOf(STATE.user);
+  if(STATE.page==='dashboard'){setHeader(role==='Lead / Supervisor'?'My Assessment':'Management Dashboard',role==='Lead / Supervisor'?'Latest result, monthly history and current status':'Current month performance with prior-month comparison');renderDashboard();}
+  else if(STATE.page==='performance'){setHeader('Performance','Current month vs previous month by employee');renderPerformance();}
+  else if(STATE.page==='persistentLow'){setHeader('Persistent Low Performers','Employees below the selected threshold in both comparison months');renderPersistentLowPerformers();}
+  else if(STATE.page==='pending'){setHeader('Pending Employees','Required employees without a current-month result');renderPending();}
+  else if(STATE.page==='locations'){setHeader('Locations','Governorate comparison and employee drill-down');renderLocations();}
+  else if(STATE.page==='questions'){setHeader('Question Reference','Questions, answer key and references by month');renderQuestions();}
+  else if(STATE.page==='history'){setHeader('Monthly History','Month-level trend across the assessment periods');renderHistory();}
+  else if(STATE.page==='quality'){setHeader('Data Quality','Integrity checks for the selected month');renderQuality();}
+  else if(STATE.page==='security'){setHeader('Device Abuse','Private technical audit for the authorized internal view');renderSecurity();}
+  else if(STATE.page==='employee'&&STATE.selectedEmployee){renderEmployeeDetail(STATE.selectedEmployee);}
 }
-
-function renderDashboardTables(population,results,pending){const role=roleOf(STATE.user);let rankings=''; if(role==='Director / Head'){const byGov=rankBy(results,h=>h._h?.Governorate||h.governorate||'—');const byRegion=rankBy(results,h=>h._h?.Region||'—');rankings+=rankingCard('Strongest Governorates',byGov.slice(0,5));rankings+=rankingCard('Weakest Governorates',byGov.slice().sort((a,b)=>a.avg-b.avg).slice(0,5));rankings+=rankingCard('Region Results',byRegion,true);} else {const byCity=rankBy(results,h=>h._h?.City||h.governorate||'—');rankings+=rankingCard('Location Results',byCity,true);} const additionalSubmitted=results.filter(r=>!r._eligible);
-  html=`<div class="dashboard-ranking-stack">${rankings}</div><div style="margin-top:16px" class="grid two"><div class="card"><div class="card-head"><div><h3>Pending Employees</h3><div class="section-note">${pending.length} required employee(s) have no submission</div></div><button class="logout" id="goPending">Open full list</button></div>${pending.length?pendingTable(pending):'<div class="empty"><strong>All required employees completed the assessment.</strong></div>'}</div><div class="card"><div class="card-head"><div><h3>Additional Submissions</h3><div class="section-note">Completed submissions from people outside the Lead / Supervisor requirement; included in population totals.</div></div></div><div style="font-size:30px;font-weight:900;color:var(--blue)">${additionalSubmitted.length}</div><div class="section-note" style="margin-top:6px">They remain visible in Performance and employee drill-downs.</div></div></div>`; $('#dashboardTables').innerHTML=html; $('#goPending')?.addEventListener('click',()=>{STATE.page='pending';render()});}
-
-function rankingCard(title,items,small=false){return `<div class="card"><div class="card-head"><div><h3>${esc(title)}</h3><div class="section-note">Average score · completed submissions</div></div></div>${items.length?`<div class="table-wrap"><table class="table"><thead><tr><th>#</th><th>Location</th><th>Employees</th><th>Average</th></tr></thead><tbody>${items.map((x,i)=>`<tr><td>${i+1}</td><td>${esc(x.name)}</td><td>${x.count}</td><td class="score ${scoreClass(x.avg)}">${pct(x.avg)}</td></tr>`).join('')}</tbody></table></div><div class="mobile-list">${items.map((x,i)=>`<div class="mobile-rank-card"><div class="mobile-rank-head"><div style="display:flex;gap:10px;min-width:0"><div class="mobile-rank-num">${i+1}</div><div><div class="mobile-rank-name">${esc(x.name)}</div><div class="mobile-rank-meta">${x.count} completed submission(s)</div></div></div><div class="mobile-rank-score score ${scoreClass(x.avg)}">${pct(x.avg)}</div></div></div>`).join('')}</div>`:'<div class="empty">No data</div>'}</div>`}
-function pendingTable(rows){const sorted=rows.slice().sort((a,b)=>`${a['Region']}|${a['Governorate']}|${a['City']}|${a['Employee Name']}`.localeCompare(`${b['Region']}|${b['Governorate']}|${b['City']}|${b['Employee Name']}`));return `<div class="table-wrap"><table class="table"><thead><tr><th>Employee</th><th>Position</th><th>Region</th><th>Governorate</th><th>City</th><th>Code</th></tr></thead><tbody>${sorted.map(h=>`<tr><td>${esc(h['Employee Name'])}</td><td>${esc(h['Position'])}</td><td>${esc(h['Region'])}</td><td>${esc(h['Governorate'])}</td><td>${esc(h['City'])}</td><td><span class="link" data-emp="${esc(h._code)}">${esc(h._code)}</span></td></tr>`).join('')}</tbody></table></div><div class="mobile-list">${sorted.map(h=>`<div class="mobile-pending-card" data-emp="${esc(h._code)}"><div class="mobile-pending-head"><div><div class="mobile-rank-name">${esc(h['Employee Name'])}</div><div class="mobile-pending-meta">${esc(h['Position'])} · ${esc(h['Governorate']||'—')} · ${esc(h['City']||'—')}</div><div class="mobile-pending-meta">${esc(h['Region']||'—')} · ${esc(h._code)}</div></div><span class="badge amber">Pending</span></div></div>`).join('')}</div>`}
-
+function changeText(v){const n=Number(v);if(!Number.isFinite(n))return '<span class="change-flat">—</span>';const c=Math.abs(n)<0.05?'change-flat':n>0?'change-up':'change-down';return `<span class="${c}">${n>0?'+':''}${n.toFixed(1).replace(/\.0$/,'')} pts</span>`;}
+function createOrDestroyChart(key,canvas,config){if(STATE.charts[key])STATE.charts[key].destroy();if(canvas)STATE.charts[key]=new Chart(canvas,config);}
+function renderDashboard(){
+  if(roleOf(STATE.user)==='Lead / Supervisor'){renderEmployeeDashboard();return;}
+  const p=STATE.period,prev=STATE.previousPeriod;const pop=scopePopulationRecords(STATE.user,p),results=scopeSubmittedResults(STATE.user,p),pending=pendingEmployees(STATE.user,p);const total=pop.length,completion=total?results.length/total*100:0,avg=average(results);const prevResults=prev?scopeSubmittedResults(STATE.user,prev):[];const prevAvg=prevResults.length?average(prevResults):NaN;
+  $('content').innerHTML=`
+  <div class="grid kpis">
+    <div class="kpi green"><div class="label">Population</div><div class="value">${total}</div><div class="hint">Required employees + actual completed submissions</div></div>
+    <div class="kpi"><div class="label">Completed</div><div class="value">${results.length}</div><div class="hint">Unique completed employees</div></div>
+    <div class="kpi red"><div class="label">Pending</div><div class="value">${pending.length}</div><div class="hint">Required employees without a completed result</div></div>
+    <div class="kpi blue"><div class="label">Completion</div><div class="value">${pct(completion)}</div><div class="hint">Completed ÷ population</div></div>
+    <div class="kpi green"><div class="label">Average</div><div class="value">${pct(avg)}</div><div class="hint">Unique completed employees</div></div>
+    <div class="kpi"><div class="label">vs ${esc(prev?displayMonth(prev):'Previous')}</div><div class="value">${Number.isFinite(prevAvg)?changeText(avg-prevAvg):'—'}</div><div class="hint">Average score movement</div></div>
+  </div>
+  <div class="grid two" style="margin-top:16px">
+    <div class="card"><div class="card-head"><div><h3>Product Performance</h3><div class="section-note">${esc(displayMonth(p))}${prev?' vs '+esc(displayMonth(prev)):''}</div></div></div><div class="chart-wrap"><canvas id="productTrendChart"></canvas></div></div>
+    <div class="card"><div class="card-head"><div><h3>Completion Overview</h3><div class="section-note">Selected assessment month</div></div></div><div class="chart-wrap"><canvas id="completionChart"></canvas></div></div>
+  </div>
+  <div id="dashTrend" style="margin-top:16px"></div>
+  <div class="grid two" style="margin-top:16px">
+    <div class="card"><div class="card-head"><div><h3>Pending Employees</h3><div class="section-note">${pending.length} required employee(s) have no ${esc(displayMonth(p))} completed result</div></div><button class="logout" id="goPending">Open full list</button></div>${pending.length?pendingTable(pending):'<div class="empty"><strong>No pending employees.</strong>All required employees have a completed result for this month.</div>'}</div>
+    <div class="card"><div class="card-head"><div><h3>Additional Submissions</h3><div class="section-note">Completed submissions outside the required Lead / Supervisor population</div></div></div><div style="font-size:30px;font-weight:900;color:var(--blue)">${results.filter(r=>!r._eligible).length}</div><div class="section-note">Kept for analysis and audit.</div></div>
+  </div>`;
+  const trendRegions=['Upper Egypt','Delta & Canal','Greater Cairo'].map(reg=>{const cur=results.filter(r=>r._h?.Region===reg);const prv=prevResults.filter(r=>r._h?.Region===reg);return {reg,curAvg:cur.length?average(cur):NaN,prevAvg:prv.length?average(prv):NaN,curN:cur.length};});
+  $('dashTrend').innerHTML=`<div class="card"><div class="card-head"><div><h3>Region Trend</h3><div class="section-note">Current selected month compared with the previous available month</div></div></div><div class="table-wrap"><table class="table small-table"><thead><tr><th>Region</th><th>${esc(displayMonth(p))}</th><th>${esc(prev?displayMonth(prev):'Previous')}</th><th>Change</th><th>Completed</th></tr></thead><tbody>${trendRegions.map(x=>`<tr><td>${esc(x.reg)}</td><td>${Number.isFinite(x.curAvg)?pct(x.curAvg):'—'}</td><td>${Number.isFinite(x.prevAvg)?pct(x.prevAvg):'—'}</td><td>${Number.isFinite(x.curAvg)&&Number.isFinite(x.prevAvg)?changeText(x.curAvg-x.prevAvg):'—'}</td><td>${x.curN}</td></tr>`).join('')}</tbody></table></div></div>`;
+  const products=['MF','CF','Gam3ya','Investment'];
+  const curData=products.map(k=>{const vals=results.map(r=>r._products[k]).filter(Number.isFinite);return vals.length?mean(vals):null;});
+  const prevData=products.map(k=>{const vals=prevResults.map(r=>r._products[k]).filter(Number.isFinite);return vals.length?mean(vals):null;});
+  const datasets=[{label:displayMonth(p),data:curData,backgroundColor:'#00A970',borderRadius:8}];
+  if(prevResults.length)datasets.push({label:displayMonth(prev),data:prevData,backgroundColor:'#a9cfc1',borderRadius:8});
+  createOrDestroyChart('productTrend',$('productTrendChart'),{type:'bar',data:{labels:products,datasets},options:{responsive:true,maintainAspectRatio:false,scales:{y:{min:0,max:100,ticks:{callback:v=>v+'%'}},x:{grid:{display:false}}},plugins:{legend:{display:datasets.length>1}}}});
+  createOrDestroyChart('completion',$('completionChart'),{type:'doughnut',data:{labels:['Completed','Pending'],datasets:[{data:[results.length,pending.length],backgroundColor:['#00A970','#e9eef0'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,cutout:'72%',plugins:{legend:{position:'bottom'}}}});
+  $('goPending')?.addEventListener('click',()=>{STATE.page='pending';render();});
+}
+function mean(arr){return arr.length?arr.reduce((a,b)=>a+b,0)/arr.length:0;}
+function renderEmployeeDashboard(){
+  const c=code(STATE.user['Functional Code']);const curMap=latestCompletedByCode(STATE.period);const curRaw=curMap.get(c);const all=[];
+  for(const p of periods()){const r=latestCompletedByCode(p).get(c);if(r)all.push(enrichResult(r,p));}
+  const latest=all.slice().sort((a,b)=>monthOrder(a._period,b._period)).slice(-1)[0];const avg=latest?average(all):NaN;const prev=STATE.previousPeriod?latestCompletedByCode(STATE.previousPeriod).get(c):null;const cur=curRaw?enrichResult(curRaw,STATE.period):null;
+  if(!cur){$('content').innerHTML=`<div class="card"><div class="alert info">No completed result for ${esc(displayMonth(STATE.period))}. Your latest available completed result is ${latest?esc(displayMonth(latest._period)):'—'}.</div>${latest?employeeMiniSummary(latest,avg):'<div class="empty"><strong>No completed assessment result.</strong>No completed result exists in the available months.</div>'}</div>`;return;}
+  const delta=prev?(cur._score-enrichResult(prev,STATE.previousPeriod)._score):NaN;
+  $('content').innerHTML=`<div class="card"><div class="person-head"><div class="person-main"><div class="avatar">${esc(initials(STATE.user['Employee Name']))}</div><div><div class="person-name">${esc(STATE.user['Employee Name'])}</div><div class="person-meta">${esc(c)} · ${esc(STATE.user['Position'])} · ${esc(STATE.user['Governorate']||'—')} · ${esc(STATE.user['Region']||'—')}</div><div style="margin-top:8px"><span class="badge green">${esc(displayMonth(STATE.period))}</span> <span class="badge blue">Completed</span></div></div></div><div class="score-hero">${pct(cur._score)}</div></div></div>${employeeHistoryBlocks(cur,prev,all,avg,delta)}`;
+}
+function employeeMiniSummary(latest,avg){return `<div class="person-head"><div><div class="person-name">${esc(latest._displayName)}</div><div class="person-meta">Latest result: ${esc(displayMonth(latest._period))}</div></div><div class="score-hero">${pct(latest._score)}</div></div><div class="grid detail-grid" style="margin-top:16px">${[['Average',avg],['MF',latest._products.MF],['CF',latest._products.CF],['Gam3ya',latest._products.Gam3ya],['Investment',latest._products.Investment]].map(([l,v])=>`<div class="detail-item"><div class="small">${l}</div><div class="big score ${scoreClass(v)}">${pct(v)}</div></div>`).join('')}</div>`;}
+function employeeHistoryBlocks(cur,prev,all,avg,delta){return `<div class="grid detail-grid" style="margin-top:16px">${[['Current',cur._score],['Previous',prev?enrichResult(prev,STATE.previousPeriod)._score:NaN],['Average',avg],['Change',delta]].map(([l,v])=>`<div class="detail-item"><div class="small">${esc(l)}</div><div class="big ${l==='Change'?'':'score '+scoreClass(v)}" style="${l==='Change'?'color:var(--green)':''}">${l==='Change'?(Number.isFinite(v)?changeText(v):'—'):pct(v)}</div></div>`).join('')}</div><div class="card" style="margin-top:16px"><div class="card-head"><div><h3>Monthly History</h3><div class="section-note">Available assessment results</div></div></div><div class="table-wrap"><table class="table"><thead><tr><th>Month</th><th>Overall</th><th>MF</th><th>CF</th><th>Gam3ya</th><th>Investment</th><th>Change</th></tr></thead><tbody>${all.map((r,i)=>`<tr><td>${esc(displayMonth(r._period))}</td><td class="score ${scoreClass(r._score)}">${pct(r._score)}</td><td>${pct(r._products.MF)}</td><td>${pct(r._products.CF)}</td><td>${pct(r._products.Gam3ya)}</td><td>${pct(r._products.Investment)}</td><td>${i?changeText(r._score-all[i-1]._score):'—'}</td></tr>`).join('')}</tbody></table></div></div><div id="selfIncorrect" class="card" style="margin-top:16px"></div>`;const inc=incorrectQuestions(cur);$('selfIncorrect').innerHTML=incorrectBlock(inc,cur._period);}
+function incorrectQuestions(r){const qs=DATA.questions[r._period]||[];const out=[];for(let i=1;i<=qs.length;i++){const chosen=norm(r[`q${i}`]).toUpperCase();const correct=norm(qs[i-1]?.['Correct Option']).toUpperCase();if(chosen!==correct)out.push({i,q:qs[i-1],chosen,chosenText:chosen?qs[i-1]?.[`Option ${chosen}`]||chosen:'لم تتم الإجابة'});}return out;}
+function incorrectBlock(items,period){return `<div class="card-head"><div><h3>Incorrect Questions — ${esc(displayMonth(period))}</h3><div class="section-note">Only questions answered differently from the Question Bank.</div></div><span class="badge ${items.length?'red':'green'}">${items.length} issue(s)</span></div>${items.length?items.map(x=>`<div class="question-card"><div class="question-top"><span class="badge">Q${x.i}</span><span class="badge">${esc(sectionLabel(sectionKey(x.q?.Section)))}</span></div><div class="q-text" style="margin-top:10px">${esc(x.q?.Question||'—')}</div><div class="answer-line answer-your"><strong>إجابتك:</strong> ${esc(x.chosenText||'—')}</div><div class="answer-line answer-correct"><strong>الإجابة الصحيحة:</strong> ${esc(x.q?.['Correct Answer']||'—')}</div><div class="reference"><strong>Reference:</strong> ${esc(x.q?.Reference||'—')}</div></div>`).join(''):'<div class="empty"><strong>Excellent — no errors.</strong>All answers match the Question Bank answer key.</div>'}`;}
+function persistentLowCandidates(user,periodA,periodB,threshold){
+  if(!periodA||!periodB||periodA===periodB)return [];
+  const aMap=new Map(scopeSubmittedResults(user,periodA).map(r=>[r._code,enrichResult(r,periodA)]));
+  const bMap=new Map(scopeSubmittedResults(user,periodB).map(r=>[r._code,enrichResult(r,periodB)]));
+  const out=[];for(const [c,a] of aMap){const b=bMap.get(c);if(!b)continue;if(!Number.isFinite(a._score)||!Number.isFinite(b._score))continue;if(a._score<=threshold&&b._score<=threshold){const h=b._h||a._h||employeeFromAnyHierarchy(c);out.push({_code:c,_displayName:h?.['Employee Name']||b._displayName||a._displayName||c,_h:h,_aScore:a._score,_bScore:b._score,_avg:(a._score+b._score)/2,_change:b._score-a._score});}}
+  return out.sort((x,y)=>x._avg-y._avg||x._bScore-y._bScore||String(x._displayName).localeCompare(String(y._displayName)));
+}
+function lowPerfPeriods(){const ps=periods();return ps.length>=2?{a:ps[ps.length-2],b:ps[ps.length-1]}:{a:ps[0]||'',b:ps[0]||''};}
+function renderPersistentLowPerformers(){
+  if(roleOf(STATE.user)==='Lead / Supervisor'){renderEmployeeDashboard();return;}
+  const ps=periods();const def=lowPerfPeriods();const cfg=STATE.lowPerf||{a:def.a,b:def.b,threshold:70,limit:10};STATE.lowPerf=cfg;
+  const candidates=persistentLowCandidates(STATE.user,cfg.a,cfg.b,Number(cfg.threshold));const shown=candidates.slice(0,Math.max(1,Math.min(50,Number(cfg.limit)||10)));
+  const options=ps.map(p=>`<option value="${esc(p)}">${esc(displayMonth(p))}</option>`).join('');
+  $('content').innerHTML=`<div class="card"><div class="card-head"><div><h3>Consistently Low Performers</h3><div class="section-note">Employees who scored at or below the threshold in both selected months. Results are ranked by the two-month average, lowest first.</div></div><span class="badge amber">${candidates.length} match(es)</span></div><div class="filters"><label class="field" style="margin:0"><span style="font-size:11px;color:var(--muted);font-weight:800">Month 1</span><select id="lowA" class="compact-select">${options}</select></label><label class="field" style="margin:0"><span style="font-size:11px;color:var(--muted);font-weight:800">Month 2</span><select id="lowB" class="compact-select">${options}</select></label><label class="field" style="margin:0"><span style="font-size:11px;color:var(--muted);font-weight:800">Low-score threshold</span><input id="lowThreshold" class="compact-input" type="number" min="0" max="100" step="1" value="${esc(String(cfg.threshold))}" /></label><label class="field" style="margin:0"><span style="font-size:11px;color:var(--muted);font-weight:800">Show top N</span><input id="lowLimit" class="compact-input" type="number" min="1" max="50" step="1" value="${esc(String(cfg.limit))}" /></label><button id="applyLow" class="primary" style="width:auto;padding:0 18px;height:42px">Update</button></div><div style="margin-top:14px" class="low-perf-summary"><span class="badge blue">${esc(displayMonth(cfg.a))}</span><span class="badge blue">vs</span><span class="badge blue">${esc(displayMonth(cfg.b))}</span><span class="badge amber">≤ ${esc(String(cfg.threshold))}% in both months</span><span class="badge green">Showing ${shown.length} of ${candidates.length}</span></div></div><div class="card" style="margin-top:16px"><div class="card-head"><div><h3>Repeated Low Scores</h3><div class="section-note">Click an employee name to open the existing Employee Profile.</div></div></div>${shown.length?`<div class="table-wrap"><table class="table"><thead><tr><th>#</th><th>Employee</th><th>Position</th><th>Governorate</th><th>${esc(displayMonth(cfg.a))}</th><th>${esc(displayMonth(cfg.b))}</th><th>2-Month Average</th><th>Change</th></tr></thead><tbody>${shown.map((r,i)=>`<tr><td>${i+1}</td><td><span class="link" data-emp="${esc(r._code)}">${esc(r._displayName)}</span></td><td>${esc(r._h?.Position||'—')}</td><td>${esc(r._h?.Governorate||'—')}</td><td class="score ${scoreClass(r._aScore)}">${pct(r._aScore)}</td><td class="score ${scoreClass(r._bScore)}">${pct(r._bScore)}</td><td class="score ${scoreClass(r._avg)}">${pct(r._avg)}</td><td>${changeText(r._change)}</td></tr>`).join('')}</tbody></table></div>`:'<div class="empty"><strong>No employees match the current settings.</strong>Try a higher threshold or a different month pair.</div>'}</div>`;
+  $('lowA').value=cfg.a;$('lowB').value=cfg.b;$('lowA').onchange=()=>STATE.lowPerf.a=$('lowA').value;$('lowB').onchange=()=>STATE.lowPerf.b=$('lowB').value;
+  $('applyLow').onclick=()=>{const a=$('lowA').value,b=$('lowB').value,t=Math.max(0,Math.min(100,Number($('lowThreshold').value)||0)),n=Math.max(1,Math.min(50,Number($('lowLimit').value)||10));if(a===b){$('lowB').focus();return;}STATE.lowPerf={a,b,threshold:t,limit:n};renderPersistentLowPerformers();};
+  wireEmployeeLinks();
+}
 function renderPerformance(){
-  if(roleOf(STATE.user)==='Lead / Supervisor'){renderEmployeeDetail(STATE.user._code,true);return;}
-  const allSubmitted=scopeSubmittedResults(STATE.user);
-  const top=allSubmitted.slice().sort((a,b)=>b._score-a._score).slice(0,5);
-  const bottom=allSubmitted.slice().sort((a,b)=>a._score-b._score).slice(0,5);
-  $('#content').innerHTML=`<div class="performance-stack"><div class="card"><div class="card-head"><div><h3>Top 5 Employees</h3><div class="section-note">Highest overall scores</div></div></div>${employeeRanking(top)}</div><div class="card" style="margin-top:16px"><div class="card-head"><div><h3>Bottom 5 Employees</h3><div class="section-note">Lowest overall scores</div></div></div>${employeeRanking(bottom)}</div></div><div class="card" style="margin-top:16px"><div class="card-head"><div><h3>All Submitted Employees</h3><div class="section-note">Everyone who submitted within your authorized hierarchy. Non-required submissions are clearly marked.</div></div><div class="filters"><input id="perfSearch" placeholder="Search name or code" /></div></div><div id="perfTable"></div></div>`; renderPerfTable(allSubmitted); $('#perfSearch').addEventListener('input',()=>renderPerfTable(allSubmitted)); wireEmployeeLinks();
+  if(roleOf(STATE.user)==='Lead / Supervisor'){renderEmployeeDashboard();return;}
+  const p=STATE.period,prev=STATE.previousPeriod,rows=scopeSubmittedResults(STATE.user,p),prevRows=prev?scopeSubmittedResults(STATE.user,prev):[];const prevMap=new Map(prevRows.map(r=>[r._code,r]));const data=rows.map(r=>{const pr=prevMap.get(r._code);const pv=pr?enrichResult(pr,prev)._score:NaN;const nums=[r._score,pv].filter(Number.isFinite);return {...r,_prevScore:pv,_avg:nums.length?mean(nums):NaN};}).sort((a,b)=>b._score-a._score);
+  const top=data.slice(0,5),bottom=data.slice(-5).reverse();
+  $('content').innerHTML=`<div class="grid two"><div class="card"><div class="card-head"><div><h3>Top 5 — ${esc(displayMonth(p))}</h3><div class="section-note">Highest current-month scores</div></div></div>${employeeRanking(top)}</div><div class="card"><div class="card-head"><div><h3>Bottom 5 — ${esc(displayMonth(p))}</h3><div class="section-note">Lowest current-month scores</div></div></div>${employeeRanking(bottom)}</div></div><div class="card" style="margin-top:16px"><div class="card-head"><div><h3>All Submitted Employees</h3><div class="section-note">Current month with previous month, average and movement</div></div><div class="filters"><input id="perfSearch" placeholder="Search name or code" /></div></div><div id="perfTable"></div></div>`;
+  renderPerfTable(data);$('perfSearch').addEventListener('input',()=>renderPerfTable(data));
 }
-function employeeRanking(rows){return rows.length?`<div class="table-wrap"><table class="table"><thead><tr><th>#</th><th>Employee</th><th>Location</th><th>Score</th></tr></thead><tbody>${rows.map((r,i)=>`<tr><td>${i+1}</td><td><span class="link" data-emp="${esc(r._code)}">${esc(r._displayName)}</span></td><td>${esc(r._h?.Governorate||'—')}</td><td class="score ${scoreClass(r._score)}">${pct(r._score)}</td></tr>`).join('')}</tbody></table></div><div class="mobile-list">${rows.map((r,i)=>`<div class="mobile-rank-card" data-emp="${esc(r._code)}"><div class="mobile-rank-head"><div style="display:flex;gap:10px;min-width:0"><div class="mobile-rank-num">${i+1}</div><div><div class="mobile-rank-name">${esc(r._displayName)}</div><div class="mobile-rank-meta">${esc(r._h?.Position||'—')} · ${esc(r._h?.Governorate||'—')} · ${esc(r._h?.City||'—')}</div></div></div><div class="mobile-rank-score score ${scoreClass(r._score)}">${pct(r._score)}</div></div></div>`).join('')}</div>`:'<div class="empty">No completed employees.</div>'}
-function renderPerfTable(results){const q=lower($('#perfSearch')?.value);const rows=results.filter(r=>!q||lower(r._displayName).includes(q)||lower(r._code).includes(q)).sort((a,b)=>b._score-a._score);$('#perfTable').innerHTML=`<div class="table-wrap"><table class="table"><thead><tr><th>Employee</th><th>Position</th><th>Governorate</th><th>City</th><th>Status</th><th>MF</th><th>CF</th><th>الجمعية</th><th>Investment</th><th>Total</th></tr></thead><tbody>${rows.map(r=>`<tr><td><span class="link" data-emp="${esc(r._code)}">${esc(r._displayName)}</span></td><td>${esc(r._h?.Position||'—')}</td><td>${esc(r._h?.Governorate||'—')}</td><td>${esc(r._h?.City||'—')}</td><td>${r._eligible?'<span class="badge green">Required</span>':'<span class="badge gray">Not Required</span>'}</td><td class="score ${scoreClass(r._products.MF)}">${pct(r._products.MF)}</td><td class="score ${scoreClass(r._products.CF)}">${pct(r._products.CF)}</td><td class="score ${scoreClass(r._products.Gam3ya)}">${pct(r._products.Gam3ya)}</td><td class="score ${scoreClass(r._products.Investment)}">${pct(r._products.Investment)}</td><td class="score ${scoreClass(r._score)}">${pct(r._score)}</td></tr>`).join('')}</tbody></table></div><div class="mobile-list">${rows.map(r=>`<div class="mobile-rank-card" data-emp="${esc(r._code)}"><div class="mobile-rank-head"><div><div class="mobile-rank-name">${esc(r._displayName)}</div><div class="mobile-rank-meta">${esc(r._h?.Position||'—')} · ${esc(r._h?.Governorate||'—')} · ${esc(r._h?.City||'—')}</div><div class="mobile-rank-meta">${r._eligible?'Required':'Not Required'}</div></div><div class="mobile-rank-score score ${scoreClass(r._score)}">${pct(r._score)}</div></div><div class="mobile-location-grid"><div class="mobile-stat"><div class="small">MF</div><div class="big">${pct(r._products.MF)}</div></div><div class="mobile-stat"><div class="small">CF</div><div class="big">${pct(r._products.CF)}</div></div><div class="mobile-stat"><div class="small">الجمعية</div><div class="big">${pct(r._products.Gam3ya)}</div></div><div class="mobile-stat"><div class="small">Investment</div><div class="big">${pct(r._products.Investment)}</div></div></div></div>`).join('')}</div>`;wireEmployeeLinks();}
-
-function renderPending(){if(roleOf(STATE.user)==='Lead / Supervisor'){renderEmployeeDashboard(STATE.user);return;}const pending=pendingEmployees(STATE.user); const grouped=groupBy(pending,h=>`${h['Region']}||${h['Governorate']}||${h['City']}`); const entries=Array.from(grouped.entries()).sort(); let html=`<div class="alert info">الأرقام هنا تخص فقط الموظفين المطلوب منهم الاختبار حسب الـPosition: Lead / Supervisor.</div>`; if(!pending.length) html+='<div class="card empty"><strong>لا يوجد موظفون متأخرون.</strong>كل الموظفين المطلوب منهم الاختبار لديهم Submission.</div>'; else for(const [g,rs] of entries){const [reg,gov,city]=g.split('||');html+=`<div class="card" style="margin-bottom:14px"><div class="card-head"><div><h3>${esc(gov)}${city&&city!==gov?' · '+esc(city):''}</h3><div class="section-note">${esc(reg)} · ${rs.length} pending</div></div></div>${pendingTable(rs)}</div>`;} $('#content').innerHTML=html;wireEmployeeLinks();}
-
-function renderLocations(){if(roleOf(STATE.user)==='Lead / Supervisor'){renderEmployeeDashboard(STATE.user);return;} const population=scopePopulationRecords(STATE.user), results=scopeResults(STATE.user), pending=pendingEmployees(STATE.user); const grouped=groupBy(population,x=>x.h?.Governorate||x.result?.governorate||'—'); const rows=Array.from(grouped.entries()).map(([name,items])=>{const rs=items.filter(x=>x.result).map(x=>x.result); const pe=items.filter(x=>!x.result); return {name,population:items.length,results:rs,pending:pe.length,avg:average(rs)};}).sort((a,b)=>b.avg-a.avg);
- $('#content').innerHTML=`<div class="card"><div class="card-head"><div><h3>Authorized Locations</h3><div class="section-note">Total population includes required employees plus actual submissions. Click a location to drill down.</div></div></div><div class="table-wrap"><table class="table"><thead><tr><th>Governorate</th><th>Total</th><th>Completed</th><th>Pending</th><th>Completion</th><th>Average</th></tr></thead><tbody>${rows.map(r=>`<tr><td><span class="link" data-loc="${esc(r.name)}">${esc(r.name)}</span></td><td>${r.population}</td><td>${r.results.length}</td><td>${r.pending}</td><td>${pct((r.results.length/(r.population||1))*100)}</td><td class="score ${scoreClass(r.avg)}">${r.results.length?pct(r.avg):'—'}</td></tr>`).join('')}</tbody></table></div><div class="mobile-list">${rows.map((r,i)=>`<div class="mobile-location-card" data-loc="${esc(r.name)}"><div class="mobile-rank-head"><div><div class="mobile-rank-name">${esc(r.name)}</div><div class="mobile-rank-meta">${r.population} total · ${r.results.length} completed · ${r.pending} pending</div></div><div class="mobile-rank-score score ${scoreClass(r.avg)}">${r.results.length?pct(r.avg):'—'}</div></div></div>`).join('')}</div></div><div id="locationDetail" style="margin-top:16px"></div>`; $$('#content [data-loc]').forEach(el=>el.addEventListener('click',()=>showLocation(el.dataset.loc)));}
-function showLocation(loc){const population=scopePopulationRecords(STATE.user).filter(x=>(x.h?.Governorate||x.result?.governorate||'—')===loc);const all=population.map(x=>x.result?x.result:{_pending:true,_code:x.code,_displayName:x.h?.['Employee Name']||'—',_h:x.h,_score:null}).sort((a,b)=>String(a._displayName).localeCompare(String(b._displayName)));$('#locationDetail').innerHTML=`<div class="card"><div class="card-head"><div><h3>${esc(loc)}</h3><div class="section-note">Employee-level drill down · Total ${all.length}</div></div></div>${all.length?`<div class="table-wrap"><table class="table"><thead><tr><th>Employee</th><th>Position</th><th>City</th><th>Score</th><th>Status</th></tr></thead><tbody>${all.map(r=>`<tr><td><span class="link" data-emp="${esc(r._code)}">${esc(r._displayName)}</span></td><td>${esc(r._h?.Position||'—')}</td><td>${esc(r._h?.City||r._h?.Governorate||'—')}</td><td>${r._pending?'<span class="badge amber">Pending</span>':`<span class="score ${scoreClass(r._score)}">${pct(r._score)}</span>`}</td><td>${r._pending?'<span class="badge amber">Not Completed</span>':'<span class="badge green">Completed</span>'}</td></tr>`).join('')}</tbody></table></div><div class="mobile-list">${all.map(r=>`<div class="mobile-location-card" data-emp="${esc(r._code)}"><div class="mobile-rank-head"><div><div class="mobile-rank-name">${esc(r._displayName)}</div><div class="mobile-pending-meta">${esc(r._h?.Position||'—')} · ${esc(r._h?.City||r._h?.Governorate||'—')}</div></div>${r._pending?'<span class="badge amber">Pending</span>':`<span class="score ${scoreClass(r._score)}">${pct(r._score)}</span>`}</div></div>`).join('')}</div>`:'<div class="empty">No people in this location.</div>'}</div>`;wireEmployeeLinks();}
-
-function renderQuestions(){const qs=DATA.questions; $('#content').innerHTML=`<div class="card"><div class="card-head"><div><h3>18-Question Reference Library</h3><div class="section-note">Correct answers and training references only. This is not an exam.</div></div></div>${qs.map((q,i)=>`<div class="question-card"><div class="question-top"><div><span class="badge green">${esc(q['Q#'])}</span> <span class="badge">${esc(q['Section'])}</span></div><span class="badge blue">Correct: ${esc(q['Correct Option'])}</span></div><div class="q-text" style="margin-top:11px">${esc(q['Question'])}</div><div class="answer-line answer-correct"><strong>الإجابة الصحيحة:</strong> ${esc(q['Correct Answer'])}</div><div class="reference"><strong>Reference:</strong> ${esc(q['Reference']||'—')}</div></div>`).join('')}</div>`;}
-
-function renderQuality(){const hm=hierarchyMap(), rm=resultsMap();const duplicateCodes=[];const seen=new Set();for(const h of DATA.hierarchy){if(seen.has(h._code))duplicateCodes.push(h._code);seen.add(h._code)}const resultOrphans=DATA.results.filter(r=>!hm.has(r._code));const nonEligible=DATA.results.filter(r=>hm.has(r._code)&&!hm.get(r._code)._eligible);const pending=DATA.hierarchy.filter(h=>h._eligible&&!rm.has(h._code));let scoreMismatch=0, answerDataIssues=0;const invalidAnswers=[];for(const r of DATA.results){let c=0;for(let i=1;i<=18;i++){const ans=norm(r[`q${i}`]).toUpperCase(); if(ans && !['A','B','C','D'].includes(ans))invalidAnswers.push(`${r._code}: Q${i}=${ans}`); if(ans===norm(DATA.questions[i-1]['Correct Option']).toUpperCase())c++;}if(c!==Number(r.total_correct)||Math.round(c/18*10000)/100!==Math.round(Number(r.score_percentage)*100)/100)scoreMismatch++;}answerDataIssues=invalidAnswers.length;
-  const regionSummary=['Upper Egypt','Delta & Canal','Greater Cairo'].map(reg=>{const e=DATA.hierarchy.filter(h=>h._eligible&&h['Region']===reg); const done=DATA.results.filter(r=>r._h?.['Region']===reg); const extras=done.filter(r=>!e.some(h=>h._code===r._code)); return {reg,total:e.length+extras.length,eligible:e.length,completed:done.length,pending:e.filter(h=>!resultsMap().has(h._code)).length};});
-  $('#content').innerHTML=`<div class="grid four"><div class="kpi"><div class="label">Hierarchy Records</div><div class="value">${DATA.hierarchy.length}</div></div><div class="kpi green"><div class="label">Eligible</div><div class="value">${DATA.hierarchy.filter(h=>h._eligible).length}</div></div><div class="kpi"><div class="label">Results</div><div class="value">${DATA.results.length}</div></div><div class="kpi ${scoreMismatch||answerDataIssues?'red':'green'}"><div class="label">Score / Answer Issues</div><div class="value">${scoreMismatch+answerDataIssues}</div></div></div><div class="grid two" style="margin-top:16px"><div class="card"><h3>Integrity Checks</h3><div style="margin-top:14px">${checkLine('Duplicate hierarchy codes',duplicateCodes.length,0)}${checkLine('Result codes missing from hierarchy',resultOrphans.length,0)}${checkLine('Non-eligible employees with results',nonEligible.length,null,true)}${checkLine('Eligible employees without results',pending.length,null,true)}${checkLine('Stored score mismatches',scoreMismatch,0)}${checkLine('Invalid answer values',answerDataIssues,0)}</div></div><div class="card"><h3>Eligible Completion by Region</h3><div style="margin-top:12px">${regionSummary.map(x=>`<div style="padding:10px 0;border-bottom:1px solid #eef1f4"><strong>${esc(x.reg)}</strong><div class="section-note">Population ${x.total} · Required ${x.eligible} · Completed ${x.completed} · Pending ${x.pending}</div></div>`).join('')}</div><div class="alert info" style="margin-top:14px">Population KPIs use required Lead/Supervisor employees plus actual submissions. Functional Code is the unique key. Scores are not recalculated.</div></div></div>`;}
-function checkLine(label,val,expected,warning=false){const ok=expected===null?true:val===expected; return `<div style="display:flex;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid #eef1f4"><span>${esc(label)}</span><span class="badge ${ok?'green':warning?'amber':'red'}">${val}</span></div>`;}
-
-function employeeManager(h){
-  const mgrCode=code(h?.['Direct Manager Code']);
-  if(!mgrCode) return null;
-  return hierarchyMap().get(mgrCode)||null;
+function employeeRanking(rows){return rows.length?`<div class="table-wrap"><table class="table small-table"><thead><tr><th>#</th><th>Employee</th><th>Current</th><th>Change</th></tr></thead><tbody>${rows.map((r,i)=>`<tr><td>${i+1}</td><td><span class="link" data-emp="${esc(r._code)}">${esc(r._displayName)}</span></td><td class="score ${scoreClass(r._score)}">${pct(r._score)}</td><td>${Number.isFinite(r._prevScore)?changeText(r._score-r._prevScore):'—'}</td></tr>`).join('')}</tbody></table></div>`:'<div class="empty">No completed employees.</div>';}
+function renderPerfTable(data){const q=lower($('perfSearch')?.value);const rows=data.filter(r=>!q||lower(r._displayName).includes(q)||lower(r._code).includes(q));$('perfTable').innerHTML=`<div class="table-wrap"><table class="table"><thead><tr><th>Employee</th><th>Position</th><th>Governorate</th><th>Status</th><th>${esc(displayMonth(STATE.period))}</th><th>${esc(STATE.previousPeriod?displayMonth(STATE.previousPeriod):'Previous')}</th><th>Average</th><th>Change</th><th>MF</th><th>CF</th><th>Gam3ya</th><th>Investment</th></tr></thead><tbody>${rows.map(r=>`<tr><td><span class="link" data-emp="${esc(r._code)}">${esc(r._displayName)}</span></td><td>${esc(r._h?.Position||'—')}</td><td>${esc(r._h?.Governorate||r.governorate||'—')}</td><td>${r._eligible?'<span class="badge green">Required</span>':'<span class="badge gray">Not Required / Additional</span>'}</td><td class="score ${scoreClass(r._score)}">${pct(r._score)}</td><td>${Number.isFinite(r._prevScore)?pct(r._prevScore):'—'}</td><td>${pct(r._avg)}</td><td>${Number.isFinite(r._prevScore)?changeText(r._score-r._prevScore):'—'}</td><td>${pct(r._products.MF)}</td><td>${pct(r._products.CF)}</td><td>${pct(r._products.Gam3ya)}</td><td>${pct(r._products.Investment)}</td></tr>`).join('')}</tbody></table></div>`;wireEmployeeLinks();}
+function pendingTable(rows){const sorted=rows.slice().sort((a,b)=>`${a['Region']}|${a['Governorate']}|${a['City']}|${a['Employee Name']}`.localeCompare(`${b['Region']}|${b['Governorate']}|${b['City']}|${b['Employee Name']}`));return `<div class="table-wrap"><table class="table"><thead><tr><th>Employee</th><th>Position</th><th>Region</th><th>Governorate</th><th>City</th><th>Code</th></tr></thead><tbody>${sorted.map(h=>`<tr><td><span class="link" data-emp="${esc(h._code||code(h['Functional Code']))}">${esc(h['Employee Name'])}</span></td><td>${esc(h['Position'])}</td><td>${esc(h['Region'])}</td><td>${esc(h['Governorate'])}</td><td>${esc(h['City'])}</td><td><span class="link" data-emp="${esc(h._code||code(h['Functional Code']))}">${esc(h._code||code(h['Functional Code']))}</span></td></tr>`).join('')}</tbody></table></div><div class="mobile-list">${sorted.map(h=>`<div class="mobile-pending-card" data-emp="${esc(h._code||code(h['Functional Code']))}"><div class="mobile-pending-head"><div><div class="mobile-rank-name">${esc(h['Employee Name'])}</div><div class="mobile-pending-meta">${esc(h['Position'])} · ${esc(h['Governorate']||'—')} · ${esc(h['City']||'—')}</div><div class="mobile-pending-meta">${esc(h['Region']||'—')} · ${esc(h._code||code(h['Functional Code']))}</div></div><span class="badge amber">Pending</span></div></div>`).join('')}</div>`;}
+function renderPending(){if(roleOf(STATE.user)==='Lead / Supervisor'){renderEmployeeDashboard();return;}const p=STATE.period,pending=pendingEmployees(STATE.user,p),grouped=new Map();for(const h of pending){const k=`${h['Region']}||${h['Governorate']}||${h['City']}`;if(!grouped.has(k))grouped.set(k,[]);grouped.get(k).push(h);}const entries=Array.from(grouped.entries()).sort();let html=`<div class="alert info">Pending counts are based on required Lead / Supervisor employees who do not have a completed result for the selected month.</div>`;if(!pending.length)html+='<div class="card empty"><strong>No pending employees.</strong>All required employees have a completed result.</div>';else for(const [g,rs] of entries){const [reg,gov,city]=g.split('||');html+=`<div class="card" style="margin-bottom:14px"><div class="card-head"><div><h3>${esc(gov)}${city&&city!==gov?' · '+esc(city):''}</h3><div class="section-note">${esc(reg)} · ${rs.length} pending</div></div></div>${pendingTable(rs)}</div>`;}$('content').innerHTML=html;wireEmployeeLinks();}
+function renderLocations(){
+  if(roleOf(STATE.user)==='Lead / Supervisor'){renderEmployeeDashboard();return;}
+  const p=STATE.period,prev=STATE.previousPeriod,pop=scopePopulationRecords(STATE.user,p),results=scopeSubmittedResults(STATE.user,p),prevResults=prev?scopeSubmittedResults(STATE.user,prev):[];
+  const groups=new Map();for(const x of pop){const name=x.h?.Governorate||x.result?.governorate||'—';if(!groups.has(name))groups.set(name,[]);groups.get(name).push(x);}
+  const rows=Array.from(groups.entries()).map(([name,items])=>{const rs=items.filter(x=>x.result).map(x=>x.result);const prevMap=prev?latestCompletedByCode(prev):new Map();const prevRs=items.map(x=>prevMap.get(x.code)).filter(Boolean).map(r=>enrichResult(r,prev));return {name,population:items.length,completed:rs.length,pending:items.filter(x=>!x.result&&x.eligible).length,avg:average(rs),prevAvg:prevRs.length?average(prevRs):NaN};}).sort((a,b)=>b.completed-a.completed||b.avg-a.avg);
+  $('content').innerHTML=`<div class="card"><div class="card-head"><div><h3>Authorized Locations — ${esc(displayMonth(p))}</h3><div class="section-note">Selected month with previous-month comparison. Click a governorate to drill down.</div></div></div><div class="table-wrap"><table class="table"><thead><tr><th>Governorate</th><th>Population</th><th>Completed</th><th>Pending</th><th>Completion</th><th>Average</th><th>Previous</th><th>Change</th></tr></thead><tbody>${rows.map(r=>`<tr><td><span class="link" data-loc="${esc(r.name)}">${esc(r.name)}</span></td><td>${r.population}</td><td>${r.completed}</td><td>${r.pending}</td><td>${pct(r.population?r.completed/r.population*100:0)}</td><td class="score ${scoreClass(r.avg)}">${r.completed?pct(r.avg):'—'}</td><td>${Number.isFinite(r.prevAvg)?pct(r.prevAvg):'—'}</td><td>${Number.isFinite(r.prevAvg)?changeText(r.avg-r.prevAvg):'—'}</td></tr>`).join('')}</tbody></table></div><div class="mobile-list">${rows.map(r=>`<div class="mobile-location-card" data-loc="${esc(r.name)}"><div class="mobile-rank-head"><div><div class="mobile-rank-name">${esc(r.name)}</div><div class="mobile-rank-meta">${r.population} total · ${r.completed} completed · ${r.pending} pending</div></div><div class="mobile-rank-score score ${scoreClass(r.avg)}">${r.completed?pct(r.avg):'—'}</div></div></div>`).join('')}</div></div><div id="locationDetail" style="margin-top:16px"></div>`;
+  $$('[data-loc]').forEach(el=>el.addEventListener('click',()=>showLocation(el.dataset.loc)));
 }
-function openEmployeeProfile(empCode){
-  const h=hierarchyMap().get(code(empCode));
-  if(!h || !canAccessEmployee(h)) return;
-  STATE.returnPage = STATE.page==='employee' ? 'performance' : STATE.page;
-  STATE.selectedEmployee=code(empCode);
-  STATE.page='employee';
-  closeMobileMenu();
-  render();
+function showLocation(loc){
+  const p=STATE.period,prev=STATE.previousPeriod;const pop=scopePopulationRecords(STATE.user,p).filter(x=>(x.h?.Governorate||x.result?.governorate||'—')===loc);const prior=prev?latestCompletedByCode(prev):new Map();
+  const all=pop.map(x=>{const r=x.result;if(!r)return {_pending:true,_code:x.code,_displayName:x.h?.['Employee Name']||'—',_h:x.h};const pr=prior.get(x.code);return {...r,_prevScore:pr?enrichResult(pr,prev)._score:NaN};}).sort((a,b)=>String(a._displayName).localeCompare(String(b._displayName)));
+  $('locationDetail').innerHTML=`<div class="card"><div class="card-head"><div><h3>${esc(loc)}</h3><div class="section-note">Employee-level drill down · ${all.length} people</div></div></div><div class="table-wrap"><table class="table"><thead><tr><th>Employee</th><th>Position</th><th>Current</th><th>Previous</th><th>Change</th><th>Status</th></tr></thead><tbody>${all.map(r=>r._pending?`<tr><td><span class="link" data-emp="${esc(r._code)}">${esc(r._displayName)}</span></td><td>${esc(r._h?.Position||'—')}</td><td>—</td><td>—</td><td>—</td><td><span class="badge amber">Pending</span></td></tr>`:`<tr><td><span class="link" data-emp="${esc(r._code)}">${esc(r._displayName)}</span></td><td>${esc(r._h?.Position||'—')}</td><td class="score ${scoreClass(r._score)}">${pct(r._score)}</td><td>${Number.isFinite(r._prevScore)?pct(r._prevScore):'—'}</td><td>${Number.isFinite(r._prevScore)?changeText(r._score-r._prevScore):'—'}</td><td>${r._eligible?'<span class="badge green">Required</span>':'<span class="badge gray">Not Required</span>'}</td></tr>`).join('')}</tbody></table></div></div>`;wireEmployeeLinks();}
+function renderHistory(){const ps=periods();const rows=ps.map((p,i)=>{const rs=currentResults(p);const pop=scopePopulationRecords(STATE.user,p);const pen=pendingEmployees(STATE.user,p);return {p,completed:rs.length,population:pop.length,pending:pen.length,avg:average(rs),prev:i>0?average(currentResults(ps[i-1])):NaN};});$('content').innerHTML=`<div class="card"><div class="card-head"><div><h3>Assessment History</h3><div class="section-note">Historical month-level snapshot using each month's own hierarchy and question bank.</div></div></div><div class="table-wrap"><table class="table"><thead><tr><th>Month</th><th>Population</th><th>Completed</th><th>Pending</th><th>Completion</th><th>Average</th><th>Change</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${esc(displayMonth(r.p))}</td><td>${r.population}</td><td>${r.completed}</td><td>${r.pending}</td><td>${pct(r.population?r.completed/r.population*100:0)}</td><td class="score ${scoreClass(r.avg)}">${pct(r.avg)}</td><td>${Number.isFinite(r.prev)?changeText(r.avg-r.prev):'—'}</td></tr>`).join('')}</tbody></table></div></div>`;}
+function renderQuestions(){const p=STATE.period,qs=DATA.questions[p]||[];$('content').innerHTML=`<div class="card"><div class="card-head"><div><h3>${qs.length}-Question Reference Library — ${esc(displayMonth(p))}</h3><div class="section-note">Management reference only. Answer key and references for the selected month.</div></div></div>${qs.map((q,i)=>`<div class="question-card"><div class="question-top"><div><span class="badge green">${esc(q['Q#']||'Q'+(i+1))}</span> <span class="badge">${esc(sectionLabel(sectionKey(q.Section)))}</span></div><span class="badge blue">Correct: ${esc(q['Correct Option'])}</span></div><div class="q-text" style="margin-top:11px">${esc(q.Question)}</div><div class="answer-line answer-correct"><strong>Correct Answer:</strong> ${esc(q['Correct Answer'])}</div><div class="reference"><strong>Reference:</strong> ${esc(q.Reference||'—')}</div></div>`).join('')}</div>`;}
+function renderQuality(){
+  const p=STATE.period,qs=DATA.questions[p]||[],hm=hierarchyMap(p),raw=rawResults(p);let scoreMismatch=0,invalid=0;const dupCodes=[];const seen=new Set();for(const h of hierarchyFor(p)){const c=code(h['Functional Code']);if(seen.has(c)&&c)dupCodes.push(c);seen.add(c);}const rawCodes=raw.map(r=>r._code);const orphan=raw.filter(r=>!hm.has(r._code));const nonEligible=raw.filter(r=>hm.has(r._code)&&!isEligible(hm.get(r._code)));for(const r of raw){for(let i=1;i<=qs.length;i++){const a=norm(r[`q${i}`]).toUpperCase();if(a&&!['A','B','C','D'].includes(a))invalid++;}const comp=computeCorrect(r,qs);const stored=Number(r.total_correct);const storedPct=Number(r.score_percentage);if(Number.isFinite(stored)&&stored!==comp)scoreMismatch++;if(Number.isFinite(storedPct)&&Math.round(comp/qs.length*10000)/100!==Math.round(storedPct*100)/100)scoreMismatch++;}const pending=pendingEmployees(STATE.user,p);$('content').innerHTML=`<div class="grid four"><div class="kpi"><div class="label">Hierarchy Records</div><div class="value">${hierarchyFor(p).length}</div></div><div class="kpi green"><div class="label">Eligible</div><div class="value">${scopeEmployees(STATE.user,p).length}</div></div><div class="kpi"><div class="label">Current Completed Results</div><div class="value">${currentResults(p).length}</div></div><div class="kpi ${scoreMismatch||invalid?'red':'green'}"><div class="label">Answer / Score Issues</div><div class="value">${scoreMismatch+invalid}</div></div></div><div class="grid two" style="margin-top:16px"><div class="card"><h3>Integrity Checks — ${esc(displayMonth(p))}</h3><div style="margin-top:14px">${checkLine('Duplicate hierarchy codes',dupCodes.length,0)}${checkLine('Result codes missing from hierarchy',orphan.length,0)}${checkLine('Non-eligible results',nonEligible.length,null,true)}${checkLine('Required employees without completed result',pending.length,null,true)}${checkLine('Stored score/answer mismatches',scoreMismatch,0)}${checkLine('Invalid answer values',invalid,0)}</div></div><div class="card"><h3>Data Notes</h3><div class="stat-line"><span>Questions in month</span><strong>${qs.length}</strong></div><div class="stat-line"><span>Unique employee codes in results</span><strong>${new Set(rawCodes).size}</strong></div><div class="stat-line"><span>Raw submissions / unique codes</span><strong>${raw.length} / ${new Set(rawCodes).size}</strong></div><div class="alert info" style="margin-top:14px">Performance uses the latest completed submission per Functional Code for the selected month. Device audit retains all raw attempts, including Expired ones.</div></div></div>`;}
+function checkLine(label,val,expected,warning=false){const ok=expected===null?true:val===expected;return `<div class="stat-line"><span>${esc(label)}</span><span class="badge ${ok?'green':warning?'amber':'red'}">${val}</span></div>`;}
+function renderSecurity(){if(!SECURITY_AUDIT_CODES.has(code(STATE.user?.['Functional Code']))){$('content').innerHTML='<div class="card empty"><strong>Private view.</strong>This report is not available for this login.</div>';return;}const p=STATE.period;const raw=rawResults(p);const groups=new Map();for(const r of raw){const id=norm(r.device_id);if(!id)continue;if(!groups.has(id))groups.set(id,[]);groups.get(id).push(r);}const devices=Array.from(groups.entries()).map(([id,rs])=>{const codes=[...new Set(rs.map(r=>r._code))];return {id,rs,codes,first:rs.slice().sort((a,b)=>dateMs(a.start_timestamp)-dateMs(b.start_timestamp))[0],last:rs.slice().sort((a,b)=>dateMs(a.completion_timestamp||a.start_timestamp)-dateMs(b.completion_timestamp||b.start_timestamp)).slice(-1)[0]};}).sort((a,b)=>b.codes.length-a.codes.length||b.rs.length-a.rs.length);$('content').innerHTML=`<div class="security-note"><strong>Private Device Abuse / Security Audit.</strong> Restricted to the authorized internal dashboard login.</div><div class="card"><div class="card-head"><div><h3>Device Activity — ${esc(displayMonth(p))}</h3><div class="section-note">Same Device ID is different from Same IP. A shared IP alone is not treated as proof of device reuse.</div></div><span class="badge amber">${devices.filter(d=>d.codes.length>1).length} multi-code device(s)</span></div>${devices.length?devices.map(d=>`<div class="device-card"><div class="device-head"><div><div class="device-id">${esc(d.id)}</div><div class="device-meta">Attempts: ${d.rs.length} · Functional Codes: ${d.codes.length}<br>First: ${formatDateTime(d.first?.start_timestamp)} · Last: ${formatDateTime(d.last?.completion_timestamp||d.last?.start_timestamp)}<br>Browser/OS: ${esc(d.last?.browser||'—')} ${esc(d.last?.browser_version||'')} · ${esc(d.last?.operating_system||'—')}<br>IP: ${esc(d.last?.ip_address||'Not captured')}</div></div><div>${d.codes.length>1?'<span class="badge red">Multiple Functional Codes</span>':'<span class="badge green">Single Functional Code</span>'}</div></div><div class="code-list">${d.codes.map(c=>`<span class="code-pill">${esc(c)}</span>`).join('')}</div><div style="margin-top:12px" class="table-wrap"><table class="table small-table"><thead><tr><th>Functional Code</th><th>Governorate</th><th>Status</th><th>Score</th><th>Start</th><th>Device/IP</th></tr></thead><tbody>${d.rs.map(r=>`<tr><td>${esc(r._code)}</td><td>${esc(r.governorate||r._h?.Governorate||'—')}</td><td>${esc(r.result_status||'Completed')}</td><td>${pct(r._score)}</td><td>${formatDateTime(r.start_timestamp)}</td><td>${esc(r.device_id||'—')}<br>${esc(r.ip_address||'—')}</td></tr>`).join('')}</tbody></table></div></div>`).join(''):'<div class="empty">No device identifiers were captured for this month.</div>'}</div>`;}
+function employeeRecordFor(empCode,preferredPeriod){const h=hierarchyMap(preferredPeriod).get(code(empCode))||employeeFromAnyHierarchy(empCode);return h;}
+function renderEmployeeDetail(empCode){
+  const p=STATE.period,prev=STATE.previousPeriod,h=employeeRecordFor(empCode,p);if(!h||!canAccessEmployee(h,p))return;
+  const cur=latestCompletedByCode(p).get(code(empCode));const prv=prev?latestCompletedByCode(prev).get(code(empCode)):null;const all=periods().map(m=>{const r=latestCompletedByCode(m).get(code(empCode));return r?enrichResult(r,m):null;}).filter(Boolean);const avg=all.length?average(all):NaN;const curR=cur?enrichResult(cur,p):null;const prevR=prv?enrichResult(prv,prev):null;const mgrCode=code(h['Direct Manager Code']);const mgr=hierarchyMap(p).get(mgrCode)||employeeFromAnyHierarchy(mgrCode);
+  STATE.selectedEmployee=code(empCode);setHeader(h['Employee Name'],`${h['Position']} · ${h['Governorate']||'—'} · ${h['Region']||'—'}`);
+  const score=curR?curR._score:(all.length?all.slice(-1)[0]._score:NaN);
+  $('content').innerHTML=`<div class="drill"><button class="crumb active" id="backBtn">← Back</button><span class="crumb">Employee Profile</span></div><div class="card"><div class="person-head"><div class="person-main"><div class="avatar">${esc(initials(h['Employee Name']))}</div><div><div class="person-name">${esc(h['Employee Name'])}</div><div class="person-meta">${esc(h._code||code(h['Functional Code']))} · ${esc(h['Position'])} · ${esc(h['Governorate']||'—')} · ${esc(h['Region']||'—')} · ${esc(h['City']||'—')}</div><div class="person-meta">Manager: ${esc(mgr?.['Employee Name']||'—')}</div><div style="margin-top:8px">${h._eligible?'<span class="badge green">Required Assessment</span>':'<span class="badge gray">Not Required</span>'} ${curR?'<span class="badge blue">Current Completed</span>':'<span class="badge amber">Current Not Completed</span>'}</div></div></div><div class="score-hero">${Number.isFinite(score)?pct(score):'Pending'}</div></div></div>${employeeDetailHistory(curR,prevR,all,p,prev)}`;
+  $('backBtn').onclick=()=>{STATE.page=STATE.returnPage||'performance';STATE.selectedEmployee=null;render();};
 }
-function wireEmployeeLinks(){
-  $$('#content [data-emp]').forEach(el=>{
-    if(el.dataset.wired==='1') return;
-    el.dataset.wired='1';
-    el.addEventListener('click',(ev)=>{ev.preventDefault(); ev.stopPropagation(); openEmployeeProfile(el.dataset.emp);});
-  });
+function employeeDetailHistory(cur,prev,all,p,prevP){const delta=cur&&prev?cur._score-prev._score:NaN;let html=`<div class="grid detail-grid" style="margin-top:16px">${[[displayMonth(p),cur?._score],[prevP?displayMonth(prevP):'Previous',prev?._score],['Average',average(all)],['Change',delta],['Months',all.length]].map(([l,v])=>`<div class="detail-item"><div class="small">${esc(l)}</div><div class="big ${l==='Change'?'':`score ${scoreClass(v)}`}" style="${l==='Change'?'color:var(--green)':''}">${l==='Change'?(Number.isFinite(v)?changeText(v):'—'):l==='Months'?esc(v):pct(v)}</div></div>`).join('')}</div>`;html+=`<div class="card" style="margin-top:16px"><div class="card-head"><div><h3>Assessment History</h3><div class="section-note">Historical result by month</div></div></div><div class="table-wrap"><table class="table"><thead><tr><th>Month</th><th>Overall</th><th>MF</th><th>CF</th><th>Gam3ya</th><th>Investment</th><th>Change</th></tr></thead><tbody>${all.map((r,i)=>`<tr><td>${esc(displayMonth(r._period))}</td><td class="score ${scoreClass(r._score)}">${pct(r._score)}</td><td>${pct(r._products.MF)}</td><td>${pct(r._products.CF)}</td><td>${pct(r._products.Gam3ya)}</td><td>${pct(r._products.Investment)}</td><td>${i?changeText(r._score-all[i-1]._score):'—'}</td></tr>`).join('')}</tbody></table></div></div>`;if(cur)html+=`<div class="card" style="margin-top:16px">${incorrectBlock(incorrectQuestions(cur),cur._period)}</div>`;return html;}
+function wireEmployeeLinks(){$$('#content [data-emp]').forEach(el=>{if(el.dataset.wired==='1')return;el.dataset.wired='1';el.onclick=e=>{e.preventDefault();e.stopPropagation();STATE.returnPage=STATE.page;STATE.page='employee';STATE.selectedEmployee=code(el.dataset.emp);render();};});}
+function boot(){
+  Promise.all([loadWorkbook('results.xlsx'),loadWorkbook('question_bank.xlsx'),loadWorkbook('hierarchy.xlsx'),loadWorkbook('hierarchy_august.xlsx')]).then(([resultsWB,questionsWB,sepHierWB,augHierWB])=>{
+    for(const s of resultsWB.SheetNames){const ws=resultsWB.Sheets[s];const rows=XLSX.utils.sheet_to_json(ws,{defval:''});if(rows.length&&Object.prototype.hasOwnProperty.call(rows[0],'functional_code'))DATA.months[s]={results:rows};}
+    for(const s of questionsWB.SheetNames){const ws=questionsWB.Sheets[s];const rows=XLSX.utils.sheet_to_json(ws,{defval:''});if(rows.length&&Object.prototype.hasOwnProperty.call(rows[0],'Q#'))DATA.questions[s]=rows;}
+    const sepSheet=sepHierWB.Sheets['Hierarchy']||sepHierWB.Sheets[sepHierWB.SheetNames.find(s=>s.toLowerCase().includes('hierarchy'))];
+    const augSheet=augHierWB.Sheets['Hierarchy']||augHierWB.Sheets[augHierWB.SheetNames.find(s=>s.toLowerCase().includes('hierarchy'))];
+    DATA.hierarchies['Sep 2026']=sepSheet?XLSX.utils.sheet_to_json(sepSheet,{defval:''}):[];
+    DATA.hierarchies['August 2026']=augSheet?XLSX.utils.sheet_to_json(augSheet,{defval:''}):[];
+    Object.values(DATA.hierarchies).forEach(rows=>rows.forEach(h=>{h._code=code(h['Functional Code']);h._eligible=isEligible(h);}));
+    DATA.allResults=Object.values(DATA.months).flatMap(x=>x.results);
+    if(!periods().length)throw new Error('No results sheets found');
+    STATE.period=periods().slice(-1)[0];STATE.previousPeriod=previousPeriod(STATE.period);restoreSession();
+    $('loginBtn').onclick=login;$('loginCode').addEventListener('keydown',e=>{if(e.key==='Enter')login();});$('menuToggle').onclick=()=>{const o=!$('sidebar').classList.contains('open');if(o){$('sidebar').classList.add('open');$('mobileOverlay').classList.add('open');$('menuToggle').setAttribute('aria-expanded','true')}else closeMobileMenu();};$('mobileOverlay').onclick=closeMobileMenu;window.addEventListener('resize',()=>{if(window.innerWidth>850)closeMobileMenu();});
+  }).catch(err=>{console.error(err);showLoginError('Unable to load portal data. Keep results.xlsx, question_bank.xlsx, hierarchy.xlsx and hierarchy_august.xlsx beside index.html.');});
 }
-
-function renderEmployeeDetail(empCode,self=false){
-  const h=hierarchyMap().get(code(empCode));
-  const r=resultsMap().get(code(empCode));
-  if(!h) return;
-  if(!self&&!canAccessEmployee(h)) return;
-  const incorrect=[];
-  let overall=0;
-  if(r){
-    overall=r._score;
-    for(let i=1;i<=18;i++){
-      const chosen=norm(r[`q${i}`]).toUpperCase();
-      const correct=norm(questionRow(i)?.['Correct Option']).toUpperCase();
-      if(chosen!==correct) incorrect.push({i,q:questionRow(i),chosenLetter:chosen,chosenText:chosen?optionText(i,chosen):'لم تتم الإجابة'});
-    }
-  }
-  const mgr=employeeManager(h);
-  STATE.selectedEmployee=code(empCode);
-  setHeader(h['Employee Name'], `${h['Position']} · ${h['Governorate']||'—'} · ${h['City']||'—'}`);
-  $('#content').innerHTML=`
-    <div class="drill"><button class="crumb active" id="backBtn">← Back</button><span class="crumb">Employee Profile</span></div>
-    <div class="card">
-      <div class="person-head">
-        <div class="person-main">
-          <div class="avatar">${esc(initials(h['Employee Name']))}</div>
-          <div>
-            <div class="person-name">${esc(h['Employee Name'])}</div>
-            <div class="person-meta">${esc(h._code)} · ${esc(h['Position'])} · ${esc(h['Governorate']||'—')} · ${esc(h['Region']||'—')} · ${esc(h['City']||'—')}</div>
-            <div class="person-meta">Direct Manager: ${esc(mgr?.['Employee Name']||'—')} · ${esc(h['Access Level']||'—')}</div>
-            <div style="margin-top:8px">${h._eligible?'<span class="badge green">Required Assessment</span>':'<span class="badge gray">Not Required</span>'} ${r?'<span class="badge blue">Completed</span>':'<span class="badge amber">Not Completed</span>'}</div>
-          </div>
-        </div>
-        <div class="score-hero">${r?pct(overall):'Pending'}</div>
-      </div>
-    </div>
-    ${r?employeeDetailBody(r,incorrect):pendingDetailBody(h)}
-  `;
-  $('#backBtn').onclick=()=>{
-    if(self || roleOf(STATE.user)==='Lead / Supervisor'){STATE.page='dashboard';}
-    else {STATE.page=STATE.returnPage||'performance';}
-    STATE.selectedEmployee=null;
-    render();
-  };
-}
-function canAccessEmployee(h){const role=roleOf(STATE.user);if(role==='Director / Head')return true; if(role==='Lead / Supervisor')return h._code===STATE.user._code; return visibleEmployees(STATE.user).some(x=>x._code===h._code);}
-function employeeDetailBody(r,incorrect){return `<div class="grid detail-grid" style="margin-top:16px">${[['Overall',r._score],['MF',r._products.MF],['CF',r._products.CF],['الجمعية',r._products.Gam3ya],['Investment',r._products.Investment]].map(([l,v])=>`<div class="detail-item"><div class="small">${l}</div><div class="big score ${scoreClass(v)}">${pct(v)}</div></div>`).join('')}</div><div class="card" style="margin-top:16px"><div class="card-head"><div><h3>Incorrect Questions</h3><div class="section-note">Only the questions answered incorrectly or left unanswered.</div></div><span class="badge ${incorrect.length?'red':'green'}">${incorrect.length} issue(s)</span></div>${incorrect.length?incorrect.map(x=>`<div class="question-card"><div class="question-top"><span class="badge">Q${x.i}</span><span class="badge">${esc(x.q['Section'])}</span></div><div class="q-text" style="margin-top:11px">${esc(x.q['Question'])}</div><div class="answer-line answer-your"><strong>إجابتك:</strong> ${esc(x.chosenText)}</div><div class="answer-line answer-correct"><strong>الإجابة الصحيحة:</strong> ${esc(x.q['Correct Answer'])}</div><div class="reference"><strong>Reference:</strong> ${esc(x.q['Reference']||'—')}</div></div>`).join(''):'<div class="empty"><strong>ممتاز — لا توجد أخطاء.</strong>كل الـ18 سؤال تمت الإجابة عليها بشكل صحيح.</div>'}</div>`;}
-function pendingDetailBody(h){return `<div class="alert warn" style="margin-top:16px"><strong>Not Completed</strong><div style="margin-top:4px">This employee is required to take the assessment but has no matching result yet.</div></div>`}
-
+async function loadWorkbook(url){const res=await fetch(url);if(!res.ok)throw new Error(`Failed to fetch ${url}`);const ab=await res.arrayBuffer();return XLSX.read(ab,{type:'array'});}
 boot();
-$('#menuToggle').addEventListener('click',()=>{const open=!$('#sidebar').classList.contains('open'); if(open){$('#sidebar').classList.add('open');$('#mobileOverlay').classList.add('open');$('#menuToggle').setAttribute('aria-expanded','true');}else{closeMobileMenu();}});
-$('#mobileOverlay').addEventListener('click',closeMobileMenu);
-window.addEventListener('resize',()=>{if(window.innerWidth>850)closeMobileMenu();});
+
 </script>
 </body>
 </html>

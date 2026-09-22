@@ -21,3 +21,9 @@
 - Nadim Sameh Moris Louca (Functional Code `30020000`) displays `Sr. VP Operations Excellence` under his name when logged in, and the top-right role chip uses the same title. His underlying permission remains `Director / Head`.
 - Added a separate `Persistent Low Performers` view. By default it compares the two latest available months (currently August vs September), includes employees at or below `70%` in both months, and shows the lowest `10` by two-month average.
 - The persistent-low view is dynamic: comparison months, threshold, and Top N can be changed from the page without changing the rest of the portal.
+
+## Changes in v2
+- Added 19 September HR employees to `hierarchy.xlsx`, mapped to their existing city/regional manager codes so their existing responses resolve to employee profiles.
+- Removed the internal test submission for Functional Code `30020897` from both `results.xlsx` (September) and `results_raw.csv`; no assessment result is altered or recalculated for other employees.
+- Renamed the user-facing `Locations` view to `Cities` without changing its underlying data structure.
+- Updated `Top 5` ordering: current-month score remains primary; when scores tie, employees with a previous-month result are considered first, then the lower previous-month score, then higher improvement, then Functional Code for deterministic ordering.

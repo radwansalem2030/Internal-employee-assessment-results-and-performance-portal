@@ -139,11 +139,13 @@ function visibleEmployees(user,period){
   const userCode=code(user?.['Functional Code']);
   const periodUser=map.get(userCode)||null;
   const source=periodUser||user;
-  const role=roleOf(source);
-  if(role==='Director / Head')return hs.slice();
   const ownerCode=code(source?.['Scope Owner Code']);
   const owner=ownerCode?(map.get(ownerCode)||source):source;
-  if(role==='Regional Manager'||role==='City Manager'){
+  // Permissions/scope can be inherited without changing the user's displayed Access Level.
+  // Example: Assistant + Scope Owner Code -> Regional Manager should receive the same scoped view.
+  const effectiveRole=ownerCode?roleOf(owner):roleOf(source);
+  if(effectiveRole==='Director / Head')return hs.slice();
+  if(effectiveRole==='Regional Manager'||effectiveRole==='City Manager'){
     const by=new Map();for(const h of hs){const p=code(h['Direct Manager Code']);if(!by.has(p))by.set(p,[]);by.get(p).push(h);}
     const out=[];const stack=[code(owner?.['Functional Code'])];const seen=new Set();
     while(stack.length){const x=stack.pop();if(seen.has(x))continue;seen.add(x);for(const child of (by.get(x)||[])){out.push(child);stack.push(code(child['Functional Code']));}}
